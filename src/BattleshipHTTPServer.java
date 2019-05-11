@@ -12,20 +12,20 @@ public class BattleshipHTTPServer {
     private int portNumber;
 
     // verbose mode
-    private boolean verbose = true;
+    private boolean verbose;
 
     //hold the id, score and date of completion of the best game
     protected int[][] best_games;
 
     //hold the on going games
-    protected Map<Integer, Integer> saved_games;
+    protected CookieManager cookieManager;
 
 
     public BattleshipHTTPServer(int portNumber, boolean verbose) {
         this.portNumber = portNumber;
         this.verbose = verbose;
         this.best_games = new int[10][3];
-        this.saved_games = new HashMap<>();
+        this.cookieManager = new CookieManager(true);
     }
 
     private void launch () throws Exception {
