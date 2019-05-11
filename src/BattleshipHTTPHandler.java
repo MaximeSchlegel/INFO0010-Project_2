@@ -1,11 +1,12 @@
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.StringTokenizer;
 import javafx.util.Pair;
 
 
-public class BattleshipHTTPHandler extends Thread{
+public class BattleshipHTTPHandler implements Runnable{
     //version of the game
     private static final int VERSION = 2;
 
@@ -39,8 +40,6 @@ public class BattleshipHTTPHandler extends Thread{
     private String cookie;
 
     public BattleshipHTTPHandler(Socket socket, BattleshipHTTPServer server) {
-        super("BattleshipHTTPHandler");
-
         //initialize the io
         this.connectedClient = socket;
         this.inFromClient = null;
@@ -54,8 +53,6 @@ public class BattleshipHTTPHandler extends Thread{
     }
 
     public BattleshipHTTPHandler(Socket socket, BattleshipHTTPServer server, boolean verbose) {
-        super("BattleshipHTTPHandler");
-
         //initialize the io
         this.connectedClient = socket;
         this.inFromClient = null;
@@ -70,7 +67,6 @@ public class BattleshipHTTPHandler extends Thread{
         }
     }
 
-    @Override
     public void run() {
         try {
             this.inFromClient = new BufferedReader(new InputStreamReader(this.connectedClient.getInputStream()));
@@ -152,17 +148,7 @@ public class BattleshipHTTPHandler extends Thread{
                     /////
                 } else if (httpQuerry.equals("/hall_of_fame.html")) {
                     //return the hall of fame page
-
-                    String response = "Hall of fame";
-
-                    // send HTTP Headers
-                    headerOut.println("HTTP/1.1 200 OK");
-                    headerOut.println("Server: " + httpHost);
-                    headerOut.println("Date: " + new Date());
-                    headerOut.println("Content-type: " + "text/html");
-                    headerOut.println("Content-length: " + response.getBytes().length);
-                    headerOut.println("Set-Cookie: " + "Battleship=" + "123456789");
-
+                    this.sendHallOfFame();
 
                 } else {
                     //this page does not exist
@@ -337,6 +323,53 @@ public class BattleshipHTTPHandler extends Thread{
 
         headerOut.print(play_html);
         headerOut.flush();
+    }
+    private void sendHallOfFame() throws IOException {
+        StringBuilder responseBuilder = new StringBuilder();
+        responseBuilder.append(
+            "<!DOCTYPE html>\n" +
+            "<html lang=\"en\">\n" +
+            "   <head>\n" +
+            "       <meta charset=\"UTF-8\">\n" +
+            "       <title>Battleship - Hall of Fame</title>\n" +
+            "   </head>\n" +
+            "   <body>\n" +
+            "       <h1>Hall of Fame</h1>\n");
+
+        ArrayList<Pair<String, Integer>> halloffame = this.master.bestGames.getScore();
+        if (halloffame.size() == 0) {
+            responseBuilder.append("Nobody beat the game. Try it !");
+        } else {
+            responseBuilder.append(
+                    "       <table>\n" +
+                    "           <tr><th>Username</th><th>Score</th></tr>\n");
+            for(Pair<String, Integer> score: halloffame) {
+                responseBuilder.append(
+                    "           <tr><th>" + score.getKey() + "</th><th>" + score.getValue() + "</th></tr>");
+            }
+            responseBuilder.append(
+                    "       </table>\n");
+        }
+
+        responseBuilder.append(
+
+            "   </body>\n" +
+            "</html>");
+
+        String response = responseBuilder.toString();
+
+
+        // send HTTP Headers
+        this.headerOut.println("HTTP/1.1 200 OK");
+        this.headerOut.println("Server: " + SERVER_DETAILS);
+        this.headerOut.println("Date: " + new Date());
+        this.headerOut.println("Content-type: " + "text/html");
+        this.headerOut.println("Content-length: " + response.getBytes().length);
+        this.headerOut.println();
+        this.headerOut.flush();
+
+        this.dataOut.write(response.getBytes(),0, response.getBytes().length);
+        this.dataOut.flush();
     }
 }
 

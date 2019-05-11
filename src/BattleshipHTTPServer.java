@@ -6,6 +6,8 @@ import java.util.Map;
 import java.io.*;
 import javax.imageio.*;
 import java.util.Base64;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class BattleshipHTTPServer {
     //version of the game
@@ -18,11 +20,13 @@ public class BattleshipHTTPServer {
     private boolean verbose;
 
     //hold the id, score and date of completion of the best game
-    protected int[][] best_games;
+    protected HallOfFame bestGames;
 
     //hold the on going games
     protected CookieManager cookieManager;
 
+    //Thread pool to execute client request
+    private ExecutorService threadPool;
 
 
     //keep the pictures in base64 saved for all games
@@ -31,7 +35,7 @@ public class BattleshipHTTPServer {
     public String claudy;
 
 
-    public BattleshipHTTPServer(int portNumber, boolean verbose,String expl_dir,String wauta_dir,String claudy_dir) {
+    public BattleshipHTTPServer(int threadPoolSize, int portNumber, boolean verbose,String expl_dir,String wauta_dir,String claudy_dir) {
 
         try {
             //save the pictures in base 64
@@ -56,9 +60,10 @@ public class BattleshipHTTPServer {
             System.out.println("Il y a eu un problème dans la lecture des fichiers images.");
         }
 
+        this.threadPool = Executors.newFixedThreadPool(threadPoolSize);
         this.portNumber = portNumber;
         this.verbose = verbose;
-        this.best_games = new int[10][3];
+        this.bestGames = new HallOfFame();
         this.cookieManager = new CookieManager();
     }
 
@@ -82,7 +87,7 @@ public class BattleshipHTTPServer {
 
                 //create the worker to handle the connection
                 BattleshipHTTPHandler worker = new BattleshipHTTPHandler(socket, this);
-                worker.start();
+                this.threadPool.execute(worker);
 
                 if (verbose) {
                     System.out.println("Connection handled. (" + new Date() + ")\n");
@@ -102,18 +107,23 @@ public class BattleshipHTTPServer {
          */
         int portNumber = 2511;
         boolean verbose = true;
+        int threadPoolSize = 25;
 
         if (args.length == 1) {
-            portNumber = Integer.parseInt(args[0]);
-        } else if (args.length == 2) {
-            portNumber = Integer.parseInt(args[0]);
-            verbose = Boolean.parseBoolean(args[1]);
-        } else if (args.length > 2) {
+            threadPoolSize = Integer.parseInt(args[0]);
+        }else if (args.length == 2) {
+            threadPoolSize = Integer.parseInt(args[0]);
+            portNumber = Integer.parseInt(args[1]);
+        } else if (args.length == 3) {
+            threadPoolSize = Integer.parseInt(args[0]);
+            portNumber = Integer.parseInt(args[1]);
+            verbose = Boolean.parseBoolean(args[2]);
+        } else if (args.length > 3) {
             System.out.println("Incorrect number of args");
             System.exit(1);
         }
 
-        BattleshipHTTPServer server = new BattleshipHTTPServer(portNumber, verbose, "Explosion.jpg","Wauta.jpg","Claudy.png");
+        BattleshipHTTPServer server = new BattleshipHTTPServer(threadPoolSize, portNumber, verbose, "Explosion.jpg","Wauta.jpg","Claudy.png");
 
         try {
             server.launch();
@@ -123,4 +133,5 @@ public class BattleshipHTTPServer {
             System.exit(1);
         }
     }
+
 }
