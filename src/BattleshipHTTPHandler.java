@@ -41,28 +41,30 @@ public class BattleshipHTTPHandler extends Thread{
             in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
             // we get character output stream to client (for headers)
             out = new PrintWriter(this.socket.getOutputStream());
-//            // get binary output stream to client (for requested data)
-//            dataOut = new BufferedOutputStream(this.socket.getOutputStream());
+            // get binary output stream to client (for requested data)
+            dataOut = new BufferedOutputStream(this.socket.getOutputStream());
 
             String request = in.readLine(); //get the first line of the request => method and target ressource
-            StringTokenizer parser = new StringTokenizer(request); // parse the line to get the token
-            String method = parser.nextToken();
+            StringTokenizer request_parser = new StringTokenizer(request); // parse the line to get the token
+            String method = request_parser.nextToken();
             System.out.println(method);
 
             String host = in.readLine();
-            StringTokenizer parser = new StringTokenizer(request); // parse the line to get the token
-
+            StringTokenizer host_parser = new StringTokenizer(host); // parse the line to get the token
+            host_parser.nextToken();
+            String host_id = host_parser.nextToken();
+            System.out.println(host_id);
 
             if (method.equals("GET")) {
-                String target = parser.nextToken();
+                String target = request_parser.nextToken();
                 System.out.println(target);
 
                 if (target.equals("/")) {
                     //if the client required the root, we redirect him on the play page
                     out.println("HTTP/1.1 303 See Other");
-                    out.println("Server:" + " localhost:2511");
+                    out.println("Server: " + host_id);
                     out.println("Date: " + new Date());
-                    out.println("Location: " + "localhost:2511" + "/play.html");
+                    out.println("Location: " + host_id + "/play.html");
                     out.println("Content-length: 0");
                     out.println();
                     out.flush();
@@ -70,13 +72,43 @@ public class BattleshipHTTPHandler extends Thread{
                 } else if (target.equals("/play.html")) {
                     //proc the launch of the game
 
+                    String response = "Play";
+
+                    // send HTTP Headers
+                    out.println("HTTP/1.1 200 OK");
+                    out.println("Server: " + host_id);
+                    out.println("Date: " + new Date());
+                    out.println("Content-type: " + "text/html");
+                    out.println("Content-length: " + response.getBytes().length);
+                    out.println("Set-Cookie: " + "Battleship=" + "123456789");
+                    out.println(); // blank line between headers and content, very important !
+                    out.flush(); // flush character output stream buffer
+
+                    dataOut.write(response.getBytes(), 0, response.getBytes().length);
+                    dataOut.flush();
+
                 } else if (target.equals("/hall_of_fame.html")) {
                     //return the hall of fame page
+
+                    String response = "Hall of fame";
+
+                    // send HTTP Headers
+                    out.println("HTTP/1.1 200 OK");
+                    out.println("Server: " + host_id);
+                    out.println("Date: " + new Date());
+                    out.println("Content-type: " + "text/html");
+                    out.println("Content-length: " + response.getBytes().length);
+                    out.println("Set-Cookie: " + "Battleship=" + "123456789");
+                    out.println(); // blank line between headers and content, very important !
+                    out.flush(); // flush character output stream buffer
+
+                    dataOut.write(response.getBytes(), 0, response.getBytes().length);
+                    dataOut.flush();
 
                 } else {
                     //this page does not exist
                     out.println("HTTP/1.1 404 Not Found");
-                    out.println("Server:" + " localhost:2511");
+                    out.println("Server: " + host_id);
                     out.println("Date: " + new Date());
                     out.println("Content-length: 0");
                     out.println();
@@ -92,7 +124,7 @@ public class BattleshipHTTPHandler extends Thread{
 
             } else {
                 out.println("HTTP/1.1 405 Method Not Allowed");
-                out.println("Server:" + " localhost:2511");
+                out.println("Server: " + host_id);
                 out.println("Date: " + new Date());
                 out.println("Content-length: 0");
                 out.println();
