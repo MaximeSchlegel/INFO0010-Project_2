@@ -7,6 +7,9 @@
 <body>
     <h1>Play</h1>
     <script type="text/javascript">
+
+    var gamestate = Array(100).fill(0);
+
     var background = new Image();
     background.src= "water.png";
     nuage = new Image();
@@ -31,22 +34,55 @@
         var x;
         var y;
 
-        for(var x=0;x<10;x++)
+        for(var id=0;id<100;id++)
         {
-            for(var y=0;y<10;y++)
-            {
+            switch(gamestate[id]){
+
+            case 0:
+            //print nuage
+            context.drawImage(nuage,((id%10))*50,Math.floor(id/10)*50,50,50);
+                break;
+            case 1:
+            //print explosion
+             context.drawImage(explosion,((id%10))*50,Math.floor(id/10)*50,50,50);
+                break;
+            //case 2:
+            //print nothing
+
+
+            }
+            //print the corresponding picture on screen
+            if(gamestate[id] ==0)
                 //ici faut avoir un truc pour choisir quel image
                 context.drawImage(nuage,(x)*50,(y)*50,50,50);
-            }
+
         }
     }
     function shoot(){
     //get mouse coord
-    var crosshair = mousecoord();
+    var mx = event.clientX-  document.getElementById("field").offsetLeft -  document.getElementById("parent").offsetLeft + document.body.scrollLeft;
+    var my = event.clientY- document.getElementById("field").offsetTop -  document.getElementById("parent").offsetTop + document.body.scrollTop;
+
+
 
     //convertir en identité grid?
+    var id = Math.floor(mx/50) + Math.floor(my/50)*10;
+    alert(id);
 
     //TODO: do ajax to send grid identity
+    var request = new XMLHttpRequest();
+
+    request.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+        //change the gamestate
+        gamestate(id) = parseInt(this.responseText);
+        //redraw
+        draw();
+    }
+    request.open("POST", "", true);
+    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    request.send("id=" + id);
+};
 
     }
 

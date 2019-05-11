@@ -62,6 +62,9 @@ public class BattleshipHTTPHandler extends Thread{
                     out.println("HTTP/1.1 303 See Other");
                     out.println("Server:" + " localhost:2511");
                     out.println("Date: " + new Date());
+
+                    //TODO: nicht gut
+
                     out.println("Location: " + "localhost:2511" + "/play.html");
                     out.println("Content-length: 0");
                     out.println();
@@ -69,6 +72,7 @@ public class BattleshipHTTPHandler extends Thread{
 
                 } else if (target.equals("/play.html")) {
                     //proc the launch of the game
+
 
                 } else if (target.equals("/hall_of_fame.html")) {
                     //return the hall of fame page
