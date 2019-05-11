@@ -10,12 +10,12 @@ public class CookieManager {
     private int id_length;
     private Map<String, BattleshipGame> saved_game;
 
-    public CookieManager(int id_lenght) {
+    public CookieManager() {
         this.last_cookie_id = 0;
         this.saved_game = new HashMap<>();
     }
 
-    public boolean isUsed(String id ) {
+    public boolean isUsed(String id) {
         if (Integer.parseInt(id) > this.last_cookie_id) {
             return false;
         }
