@@ -28,7 +28,7 @@ public class BattleshipHTTPServer {
         this.cookieManager = new CookieManager(true);
     }
 
-    private void launch () throws Exception {
+    private void launch() throws Exception {
         try {
             //create the server socket listening on the gien port
             ServerSocket serverSocket = new ServerSocket(this.portNumber);
@@ -60,13 +60,12 @@ public class BattleshipHTTPServer {
         }
     }
 
-
-    public static void main (String[] args) {
+    public static void main(String[] args) {
         /*
-        * Main method accept up to 2 args
-        * args[0] => port to listen on
-        * args[1] => verbose mode for the server
-        */
+         * Main method accept up to 2 args
+         * args[0] => port to listen on
+         * args[1] => verbose mode for the server
+         */
         int portNumber = 2511;
         boolean verbose = true;
 
@@ -82,7 +81,7 @@ public class BattleshipHTTPServer {
 
         BattleshipHTTPServer server = new BattleshipHTTPServer(portNumber, verbose);
 
-        try{
+        try {
             server.launch();
         } catch (Exception e) {
             System.err.println("Server Connection error : " + e.getMessage() + "\n");
@@ -90,4 +89,5 @@ public class BattleshipHTTPServer {
             System.exit(1);
         }
     }
+
 }

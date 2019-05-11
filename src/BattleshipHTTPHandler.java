@@ -33,6 +33,8 @@ public class BattleshipHTTPHandler extends Thread{
     private boolean verbose;
 
 
+    private String cookie;
+
     public BattleshipHTTPHandler(Socket socket, BattleshipHTTPServer server) {
         super("BattleshipHTTPHandler");
 
@@ -87,13 +89,24 @@ public class BattleshipHTTPHandler extends Thread{
             System.out.println("Host :" + httpHost);
 
             //get the cookie name ???
-            String CookieLine = inFromClient.readLine(); //get the second line to extract the host address
-            System.out.println("Cookie lline :" + CookieLine);
-            //StringTokenizer hostTokenizer = new StringTokenizer(hostLine);
-            //hostTokenizer.nextToken();
-            //String httpHost = hostTokenizer.nextToken();
-            //System.out.println("Host :" + httpHost);
+            String Cookieline = inFromClient.readLine(); //get the second line to extract the host address
+            StringTokenizer CookieTokenizer = new StringTokenizer(Cookieline);
+            String iscookie = CookieTokenizer.nextToken();
 
+            while(!iscookie.equals("Cookie:")) {
+                System.out.println("Cookie lline :" + iscookie);
+                Cookieline = inFromClient.readLine(); //get the second line to extract the host address
+                CookieTokenizer = new StringTokenizer(Cookieline);
+
+                try {
+                    iscookie = CookieTokenizer.nextToken();
+                    this.cookie = CookieTokenizer.nextToken();
+                } catch (java.util.NoSuchElementException e) {
+                    System.out.println("No cookies here :/");
+                    this.cookie = "";//il n'y a pas de cookie
+                    break;
+                }
+            }
 
 
             if (httpMethod.equals("GET")) {
@@ -102,7 +115,8 @@ public class BattleshipHTTPHandler extends Thread{
                     headerOut.println("HTTP/1.1 303 See Other");
                     headerOut.println("Server: " + httpHost);
                     headerOut.println("Date: " + new Date());
-                    headerOut.println("Location: " + httpHost + "/play.html");
+                    headerOut.println("Location: " + "http://" +httpHost + "/play.html");
+                    headerOut.println("Connection: close");
                     headerOut.println("Content-length: 0");
                     headerOut.println();
                     headerOut.flush();
