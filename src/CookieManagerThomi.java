@@ -7,7 +7,7 @@ import java.util.Random;
 public class CookieManagerThomi {
     /*Handle the loading and saving of game linked to a cookie id
     * Generate the cookie id and new game*/
-    private Map<String, BattleshipGame> saved_game;
+    private Map<String, BatThomi> saved_game;
     private String cookieCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" + "0123456789"; //length = 62
 
     public CookieManager() {
@@ -27,18 +27,18 @@ public class CookieManagerThomi {
                 id += cookieCharacters.charAt(rand.nextInt(cookieCharacters.length()));
         }
 
-        BattleshipGame newGame = new BattleshipGame();
+        BatThomi newGame = new BatThomi();
         this.saved_game.put(id, newGame);
         return newGame;
     }
 
-    public BattleshipGame getGame(String id){
+    public BatThomi getGame(String id){
         if(this.isUsed(id))
             return this.saved_game.get(id);
         return null;
     }
 
-    public BattleshipGame loadGame(String id) {
+    public BatThomi loadGame(String id) {
         return this.saved_game.get(id);
     }
 
