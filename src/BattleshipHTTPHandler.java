@@ -30,11 +30,10 @@ public class BattleshipHTTPHandler extends Thread{
     @Override
     public void run() {
 
+        //initialize the i/o stream
         BufferedReader in = null;
         PrintWriter out = null;
         BufferedOutputStream dataOut = null;
-
-        String fileRequested = null;
 
         try {
             // we read characters from the client via input stream on the socket
@@ -49,8 +48,8 @@ public class BattleshipHTTPHandler extends Thread{
             String method = request_parser.nextToken();
             System.out.println(method);
 
-            String host = in.readLine();
-            StringTokenizer host_parser = new StringTokenizer(host); // parse the line to get the token
+            String host = in.readLine(); //get the second line to extract the host address
+            StringTokenizer host_parser = new StringTokenizer(host);
             host_parser.nextToken();
             String host_id = host_parser.nextToken();
             System.out.println(host_id);

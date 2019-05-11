@@ -1,86 +1,121 @@
+import java.util.ArrayList;
+import java.util.Random;
+
 //import java.util.ArrayList;
 //import java.util.Random;
 //
 public class BattleshipGame {
-    private int id;
-    private int version;
-//
-//    private ArrayList<ArrayList<Byte>> ship;
-//    private ArrayList<byte[]> history;
-//
-//    private static int gameLength = 70;
-//
-//    private void initializeShip(int len) {
-//        Random r = new Random();
-//        boolean done = false, cellUsed;
-//        int begin, orientation;
-//        ArrayList<Byte> position;
-//        while (!done) {
-//            begin = r.nextInt(99);
-//            orientation = r.nextInt(3);
-//            cellUsed = false;
-//            if (orientation == 0
-//                    && begin - 10 * len >= 0) {
-//                position = new ArrayList<>();
-//                for (int i=0; i < len; i++) {
-//                    for(ArrayList<Byte> toTest : this.ship) {
-//                        if (toTest.contains((byte) (begin - 10 * i))) {
-//                            cellUsed = true;
-//                        }
-//                    }
-//                    position.add((byte) (begin - 10 * i));
-//                }
-//                if (!cellUsed) {
-//                    this.ship.add(position);
-//                    done = true;
-//                }
-//            } else if (orientation == 1
-//                    && (begin - begin % 10) - ((begin + len) - (begin + len) % 10) == 0) {
-//                position = new ArrayList<>();
-//                for (int i=0; i < len; i++) {
-//                    for(ArrayList<Byte> toTest : this.ship) {
-//                        if (toTest.contains((byte) (begin + i))) {
-//                            cellUsed = true;
-//                        }
-//                    }
-//                    position.add((byte) (begin + i));
-//                }
-//                if (!cellUsed) {
-//                    this.ship.add(position);
-//                    done = true;
-//                }
-//            } else if (orientation == 2
-//                    && begin + 10 * len <= 99) {
-//                position = new ArrayList<>();
-//                for (int i=0; i < len; i++) {
-//                    for(ArrayList<Byte> toTest : this.ship) {
-//                        if (toTest.contains((byte) (begin + 10 * i))) {
-//                            cellUsed = true;
-//                        }
-//                    }
-//                    position.add((byte) (begin + 10 * i));
-//                }
-//                if (!cellUsed) {
-//                    this.ship.add(position);
-//                    done = true;
-//                }
-//            } else if ((begin - begin % 10) - ((begin - len) - ((begin - len) % 10)) == 0) {
-//                position = new ArrayList<>();
-//                for (int i=0; i < len; i++) {
-//                    for(ArrayList<Byte> toTest : this.ship) {
-//                        if (toTest.contains((byte) (begin - i))) {
-//                            cellUsed = true;
-//                        }
-//                    }
-//                    position.add((byte) (begin - i));
-//                }
-//                if (!cellUsed) {
-//                    this.ship.add(position);
-//                    done = true;
-//                }
-//            }
-//        }
-//    }
+    private static int VERRSION = 2;
+    private static int GAME_LENGTH = 70;
+
+    private ArrayList<ArrayList<Byte>> ship;
+    private ArrayList<byte[]> history;
+    private boolean verbose;
+
+
+    private void initializeShip(int len) {
+        Random r = new Random();
+
+        boolean done = false;
+        boolean cellUsed;
+
+        int begin, orientation;
+
+        ArrayList<Byte> position;
+
+        while (!done) {
+            //choose the starting cell of the ship and its orientation
+            begin = r.nextInt(99);
+            orientation = r.nextInt(3);
+
+            //test if the ship can be place (enough space on the line/column)
+            cellUsed = false;
+            if (orientation == 0
+                    && begin - 10 * len >= 0) {
+                position = new ArrayList<>();
+                for (int i=0; i < len; i++) {
+                    for(ArrayList<Byte> toTest : this.ship) {
+                        if (toTest.contains((byte) (begin - 10 * i))) {
+                            cellUsed = true;
+                        }
+                    }
+                    position.add((byte) (begin - 10 * i));
+                }
+                if (!cellUsed) {
+                    this.ship.add(position);
+                    done = true;
+                }
+            } else if (orientation == 1
+                    && (begin - begin % 10) - ((begin + len) - (begin + len) % 10) == 0) {
+                position = new ArrayList<>();
+                for (int i=0; i < len; i++) {
+                    for(ArrayList<Byte> toTest : this.ship) {
+                        if (toTest.contains((byte) (begin + i))) {
+                            cellUsed = true;
+                        }
+                    }
+                    position.add((byte) (begin + i));
+                }
+                if (!cellUsed) {
+                    this.ship.add(position);
+                    done = true;
+                }
+            } else if (orientation == 2
+                    && begin + 10 * len <= 99) {
+                position = new ArrayList<>();
+                for (int i=0; i < len; i++) {
+                    for(ArrayList<Byte> toTest : this.ship) {
+                        if (toTest.contains((byte) (begin + 10 * i))) {
+                            cellUsed = true;
+                        }
+                    }
+                    position.add((byte) (begin + 10 * i));
+                }
+                if (!cellUsed) {
+                    this.ship.add(position);
+                    done = true;
+                }
+            } else if ((begin - begin % 10) - ((begin - len) - ((begin - len) % 10)) == 0) {
+                position = new ArrayList<>();
+                for (int i=0; i < len; i++) {
+                    for(ArrayList<Byte> toTest : this.ship) {
+                        if (toTest.contains((byte) (begin - i))) {
+                            cellUsed = true;
+                        }
+                    }
+                    position.add((byte) (begin - i));
+                }
+                if (!cellUsed) {
+                    this.ship.add(position);
+                    done = true;
+                }
+            }
+        }
+    }
+
+    public BattleshipGame() {
+        this.verbose = true;
+
+        this.history = new ArrayList<>();
+
+        this.initializeShip(2);
+        this.initializeShip(3);
+        this.initializeShip(3);
+        this.initializeShip(4);
+        this.initializeShip(5);
+    }
+
+    public BattleshipGame(boolean verbose) {
+        this.verbose = verbose;
+
+        this.history = new ArrayList<>();
+
+        this.initializeShip(2);
+        this.initializeShip(3);
+        this.initializeShip(3);
+        this.initializeShip(4);
+        this.initializeShip(5);
+    }
 //
 //    private void shootHandler(byte position) throws Exception {
 //        //handle the shhot dialogue this the client

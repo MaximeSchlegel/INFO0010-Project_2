@@ -7,7 +7,6 @@ public class CookieManager {
     /*Handle the loading and saving of game linked to a cookie id
     * Generate the cookie id and new game*/
     private int last_cookie_id;
-    private int id_length;
     private Map<String, BattleshipGame> saved_game;
 
     public CookieManager() {
