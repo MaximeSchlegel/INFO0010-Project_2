@@ -1,5 +1,8 @@
+import javafx.util.Pair;
+
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.StringTokenizer;
 
@@ -128,11 +131,11 @@ public class BattleshipHTTPHandler extends Thread{
                     String response = "Play";
                     //String id = Cookie.get();
                     String id = "";
-                    if(this.cookieManager.isUsed(id)){
+                    if(this.master.cookieManager.isUsed(id)){
                         this.Game = this.master.cookieManager.getGame(id);
                     }
                     else{
-                        this.Game = this.master.cookieManager.getNewGame();
+                        this.Game = this.master.cookieManager.getNewGame().getValue();
                     }
 
                     // send HTTP Headers
@@ -155,21 +158,7 @@ public class BattleshipHTTPHandler extends Thread{
                     /////
                 } else if (httpQuerry.equals("/hall_of_fame.html")) {
                     //return the hall of fame page
-
-                    String response = "Hall of fame";
-
-                    // send HTTP Headers
-                    headerOut.println("HTTP/1.1 200 OK");
-                    headerOut.println("Server: " + httpHost);
-                    headerOut.println("Date: " + new Date());
-                    headerOut.println("Content-type: " + "text/html");
-                    headerOut.println("Content-length: " + response.getBytes().length);
-                    headerOut.println("Set-Cookie: " + "Battleship=" + "123456789");
-                    headerOut.println(); // blank line between headers and content, very important !
-                    headerOut.flush(); // flush character output stream buffer
-
-                    headerOut.println(response);
-                    headerOut.flush();
+                    this.sendHallOfFame();
 
                 } else {
                     //this page does not exist
@@ -243,6 +232,53 @@ public class BattleshipHTTPHandler extends Thread{
         }
     }
 
+    private void sendHallOfFame() throws IOException {
+        StringBuilder responseBuilder = new StringBuilder();
+        responseBuilder.append(
+            "<!DOCTYPE html>\n" +
+            "<html lang=\"en\">\n" +
+            "   <head>\n" +
+            "       <meta charset=\"UTF-8\">\n" +
+            "       <title>Battleship - Hall of Fame</title>\n" +
+            "   </head>\n" +
+            "   <body>\n" +
+            "       <h1>Hall of Fame</h1>\n");
+
+        ArrayList<Pair<String, Integer>> halloffame = this.master.best_games.getScore();
+        if (halloffame.size() == 0) {
+            responseBuilder.append("Nobody beat the game. Try it !");
+        } else {
+            responseBuilder.append(
+                    "       <table>\n" +
+                    "           <tr><th>Username</th><th>Score</th></tr>\n");
+            for(Pair<String, Integer> score: halloffame) {
+                responseBuilder.append(
+                    "           <tr><th>" + score.getKey() + "</th><th>" + score.getValue() + "</th></tr>");
+            }
+            responseBuilder.append(
+                    "       </table>\n");
+        }
+
+        responseBuilder.append(
+
+            "   </body>\n" +
+            "</html>");
+
+        String response = responseBuilder.toString();
+
+
+        // send HTTP Headers
+        this.headerOut.println("HTTP/1.1 200 OK");
+        this.headerOut.println("Server: " + SERVER_DETAILS);
+        this.headerOut.println("Date: " + new Date());
+        this.headerOut.println("Content-type: " + "text/html");
+        this.headerOut.println("Content-length: " + response.getBytes().length);
+        this.headerOut.println();
+        this.headerOut.flush();
+
+        this.dataOut.write(response.getBytes(),0, response.getBytes().length);
+        this.dataOut.flush();
+    }
 }
 
 //TODO: test the version of the incomming demand
