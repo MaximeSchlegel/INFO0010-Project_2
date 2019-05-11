@@ -74,6 +74,7 @@ public class myHTTPServer extends Thread {
                             " top: " + (50*i+100) + " ;" +
                             " left: " + (50*j+100) + " ;'>");
             responseBuffer.append("</form>");
+            responseBuffer.append("</div>");
             responseBuffer.append("</body>");
 
 

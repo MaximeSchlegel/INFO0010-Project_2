@@ -17,7 +17,7 @@ public class BattleshipHTTPServer {
     //hold the id, score and date of completion of the best game
     protected int[][] best_games;
 
-    //hold the on goinging games
+    //hold the on going games
     protected Map<Integer, Integer> saved_games;
 
 

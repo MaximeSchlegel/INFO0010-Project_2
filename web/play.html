@@ -6,5 +6,59 @@
 </head>
 <body>
     <h1>Play</h1>
+    <script type="text/javascript">
+    var background = new Image();
+    background.src= "water.png";
+    nuage = new Image();
+    nuage.src = "Claudy.png";
+    explosion = new Image();
+    explosion.src = "Explosion.jpg";
+    var canvas;
+    var context;
+   function charger(){
+   alert("lol");
+    canvas = document.getElementById("field");
+    context = canvas.getContext("2d");
+
+    draw();
+
+
+    canvas.style.display = "block";
+    }
+    function draw(){
+       context.drawImage(background,0,0,500,500);
+
+        var x;
+        var y;
+
+        for(var x=0;x<10;x++)
+        {
+            for(var y=0;y<10;y++)
+            {
+                //ici faut avoir un truc pour choisir quel image
+                context.drawImage(nuage,(x)*50,(y)*50,50,50);
+            }
+        }
+    }
+    function shoot(){
+    //get mouse coord
+    var crosshair = mousecoord();
+
+    //convertir en identité grid?
+
+    //TODO: do ajax to send grid identity
+
+    }
+
+</script>
+<!-- faut remplacer les valeurs d'une facon ou d'une autre -->
+<div id="parent" style="position: relative;max-width: 500px;max-height: 500px;">
+<canvas id="field"  style="position: relative;left: 10px;top: 0px;z-index: -1;" width="500" height="500" ></canvas>
+</div>
+
+<script type="text/javascript">
+    window.onload = charger;
+</script>
+
 </body>
 </html>
