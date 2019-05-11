@@ -3,6 +3,7 @@ import java.net.Socket;
 import java.util.Date;
 import java.util.StringTokenizer;
 
+
 public class BattleshipHTTPHandler extends Thread{
     //version of the game
     private static final int VERSION = 2;
@@ -15,145 +16,195 @@ public class BattleshipHTTPHandler extends Thread{
     private static final String FILE_NOT_FOUND = "404.html";
     private static final String METHOD_NOT_SUPPORTED = "not_supported.html";
 
-    //connection socket
-    private Socket socket;
+    //http header variable
+    private static String SERVER_DETAILS = "Java Http Server";
+
+
+
+    //connection and i/o to the client
+    private Socket connectedClient;
+    private BufferedReader inFromClient;
+    private PrintWriter headerOut;
+    private BufferedOutputStream dataOut;
 
     //reference server for hightscore and saved games
-    private BattleshipHTTPServer server;
+    private BattleshipHTTPServer master;
+
+    private boolean verbose;
+
 
     public BattleshipHTTPHandler(Socket socket, BattleshipHTTPServer server) {
         super("BattleshipHTTPHandler");
-        this.socket = socket;
-        this.server = server;
+
+        //initialize the io
+        this.connectedClient = socket;
+        this.inFromClient = null;
+        this.headerOut = null;
+        this.dataOut = null;
+
+        this.master = server;
+        this.verbose = true;
+
+        System.out.println("Handler created.");
+    }
+
+    public BattleshipHTTPHandler(Socket socket, BattleshipHTTPServer server, boolean verbose) {
+        super("BattleshipHTTPHandler");
+
+        //initialize the io
+        this.connectedClient = socket;
+        this.inFromClient = null;
+        this.headerOut = null;
+        this.dataOut = null;
+
+        this.master = server;
+        this.verbose = verbose;
+
+        if (verbose) {
+            System.out.println("Handler created.");
+        }
     }
 
     @Override
     public void run() {
-
-        //initialize the i/o stream
-        BufferedReader in = null;
-        PrintWriter out = null;
-        BufferedOutputStream dataOut = null;
-
         try {
-            // we read characters from the client via input stream on the socket
-            in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-            // we get character output stream to client (for headers)
-            out = new PrintWriter(this.socket.getOutputStream());
-            // get binary output stream to client (for requested data)
-            dataOut = new BufferedOutputStream(this.socket.getOutputStream());
+            this.inFromClient = new BufferedReader(new InputStreamReader(this.connectedClient.getInputStream()));
+            this.headerOut = new PrintWriter(this.connectedClient.getOutputStream());
+            this.dataOut = new BufferedOutputStream(this.connectedClient.getOutputStream());
 
-            String request = in.readLine(); //get the first line of the request => method and target ressource
-            StringTokenizer request_parser = new StringTokenizer(request); // parse the line to get the token
-            String method = request_parser.nextToken();
-            System.out.println(method);
+            //get the method and the querried ressource
+            String requestLine = inFromClient.readLine(); //get the first line of the request => method and target ressource
+            StringTokenizer requestTokenizer = new StringTokenizer(requestLine); // parse the line to get the token
+            String httpMethod = requestTokenizer.nextToken();
+            String httpQuerry = requestTokenizer.nextToken();
+            System.out.println(httpMethod + " " + httpQuerry);
 
-            String host = in.readLine(); //get the second line to extract the host address
-            StringTokenizer host_parser = new StringTokenizer(host);
-            host_parser.nextToken();
-            String host_id = host_parser.nextToken();
-            System.out.println(host_id);
+            //get the host name
+            String hostLine = inFromClient.readLine(); //get the second line to extract the host address
+            StringTokenizer hostTokenizer = new StringTokenizer(hostLine);
+            hostTokenizer.nextToken();
+            String httpHost = hostTokenizer.nextToken();
+            System.out.println("Host :" + httpHost);
 
-            if (method.equals("GET")) {
-                String target = request_parser.nextToken();
-                System.out.println(target);
-
-                if (target.equals("/")) {
+            if (httpMethod.equals("GET")) {
+                if (httpQuerry.equals("/")) {
                     //if the client required the root, we redirect him on the play page
-                    out.println("HTTP/1.1 303 See Other");
-                    out.println("Server: " + host_id);
-                    out.println("Date: " + new Date());
-                    out.println("Location: " + host_id + "/play.html");
-                    out.println("Content-length: 0");
-                    out.println();
-                    out.flush();
+                    headerOut.println("HTTP/1.1 303 See Other");
+                    headerOut.println("Server: " + httpHost);
+                    headerOut.println("Date: " + new Date());
+                    headerOut.println("Location: " + httpHost + "/play.html");
+                    headerOut.println("Content-length: 0");
+                    headerOut.println();
+                    headerOut.flush();
 
-                } else if (target.equals("/play.html")) {
+                } else if (httpQuerry.equals("/play.html")) {
                     //proc the launch of the game
 
                     String response = "Play";
 
                     // send HTTP Headers
-                    out.println("HTTP/1.1 200 OK");
-                    out.println("Server: " + host_id);
-                    out.println("Date: " + new Date());
-                    out.println("Content-type: " + "text/html");
-                    out.println("Content-length: " + response.getBytes().length);
-                    out.println("Set-Cookie: " + "Battleship=" + "123456789");
-                    out.println(); // blank line between headers and content, very important !
-                    out.flush(); // flush character output stream buffer
+                    headerOut.println("HTTP/1.1 200 OK");
+                    headerOut.println("Server: " + httpHost);
+                    headerOut.println("Date: " + new Date());
+                    headerOut.println("Content-type: " + "text/html");
+                    headerOut.println("Content-length: " + response.getBytes().length);
+                    headerOut.println("Set-Cookie: " + "Battleship=" + "123456789");
+                    headerOut.println(); // blank line between headers and content, very important !
+                    headerOut.flush(); // flush character output stream buffer
 
-                    dataOut.write(response.getBytes(), 0, response.getBytes().length);
-                    dataOut.flush();
+                    headerOut.println(response);
+                    headerOut.flush();
 
-                } else if (target.equals("/hall_of_fame.html")) {
+                } else if (httpQuerry.equals("/hall_of_fame.html")) {
                     //return the hall of fame page
 
                     String response = "Hall of fame";
 
                     // send HTTP Headers
-                    out.println("HTTP/1.1 200 OK");
-                    out.println("Server: " + host_id);
-                    out.println("Date: " + new Date());
-                    out.println("Content-type: " + "text/html");
-                    out.println("Content-length: " + response.getBytes().length);
-                    out.println("Set-Cookie: " + "Battleship=" + "123456789");
-                    out.println(); // blank line between headers and content, very important !
-                    out.flush(); // flush character output stream buffer
+                    headerOut.println("HTTP/1.1 200 OK");
+                    headerOut.println("Server: " + httpHost);
+                    headerOut.println("Date: " + new Date());
+                    headerOut.println("Content-type: " + "text/html");
+                    headerOut.println("Content-length: " + response.getBytes().length);
+                    headerOut.println("Set-Cookie: " + "Battleship=" + "123456789");
+                    headerOut.println(); // blank line between headers and content, very important !
+                    headerOut.flush(); // flush character output stream buffer
 
-                    dataOut.write(response.getBytes(), 0, response.getBytes().length);
-                    dataOut.flush();
+                    headerOut.println(response);
+                    headerOut.flush();
 
                 } else {
                     //this page does not exist
-                    out.println("HTTP/1.1 404 Not Found");
-                    out.println("Server: " + host_id);
-                    out.println("Date: " + new Date());
-                    out.println("Content-length: 0");
-                    out.println();
-                    out.flush();
+                    this.fileNotFound(httpQuerry);
                 }
 
-//                while (parser.hasMoreTokens()) {
-//                    String token = parser.nextToken();
-//                    System.out.println(token);
-//                }
-
-            } else if (method.equals("POST")) {
+            } else if (httpMethod.equals("POST")) {
 
             } else {
-                out.println("HTTP/1.1 405 Method Not Allowed");
-                out.println("Server: " + host_id);
-                out.println("Date: " + new Date());
-                out.println("Content-length: 0");
-                out.println();
-                out.flush();
-
-//                dataOut.write(response.getBytes(), 0, response.getBytes().length);
-//                dataOut.flush();
+                this.methodNotSupported(httpMethod);
             }
-
-
-
-//            String response = "Hello World !";
-//
-//            // send HTTP Headers
-//            out.println("HTTP/1.1 200 OK");
-//            out.println("Server:" + " localhost:2511");
-//            out.println("Date: " + new Date());
-//            out.println("Content-type: " + "text/html");
-//            out.println("Content-length: " + response.getBytes().length);
-//            out.println("Set-Cookie: " + "Battleship=" + "123456789");
-//            out.println(); // blank line between headers and content, very important !
-//            out.flush(); // flush character output stream buffer
-//
-//            dataOut.write(response.getBytes(), 0, response.getBytes().length);
-//            dataOut.flush();
-
         } catch (Exception e){
             e.printStackTrace();
         }
     }
+
+    private byte[] readFileData(File file, int fileLength) throws IOException {
+        FileInputStream fileIn = null;
+        byte[] fileData = new byte[fileLength];
+
+        try {
+            fileIn = new FileInputStream(file);
+            fileIn.read(fileData);
+        } finally {
+            if (fileIn != null)
+                fileIn.close();
+        }
+
+        return fileData;
+    }
+
+    private void fileNotFound(String fileRequested) throws IOException {
+        File file = new File(WEB_ROOT, FILE_NOT_FOUND);
+        int fileLength = (int) file.length();
+        byte[] fileData = readFileData(file, fileLength);
+
+        this.headerOut.println("HTTP/1.1 404 File Not Found");
+        this.headerOut.println("Server: " + SERVER_DETAILS);
+        this.headerOut.println("Date: " + new Date());
+        this.headerOut.println("Content-type: text/html");
+        this.headerOut.println("Content-length: " + fileLength);
+        this.headerOut.println();
+        this.headerOut.flush();
+
+        this.dataOut.write(fileData, 0, fileLength);
+        this.dataOut.flush();
+
+        if (verbose) {
+            System.out.println("File " + fileRequested + " not found");
+        }
+    }
+
+    private void methodNotSupported(String methodUsed) throws IOException {
+        File file = new File(WEB_ROOT, METHOD_NOT_SUPPORTED);
+        int fileLength = (int) file.length();
+        byte[] fileData = readFileData(file, fileLength);
+
+        this.headerOut.println("HTTP/1.1 405 Method Not Allowed");
+        this.headerOut.println("Server: " + SERVER_DETAILS);
+        this.headerOut.println("Date: " + new Date());
+        this.headerOut.println("Content-type: text/html");
+        this.headerOut.println("Content-length: " + fileLength);
+        this.headerOut.println();
+        this.headerOut.flush();
+
+        this.dataOut.write(fileData, 0, fileLength);
+        this.dataOut.flush();
+
+        if (this.verbose) {
+            System.out.println("File " + methodUsed + " not found");
+        }
+    }
+
 }
 
 //TODO: test the version of the incomming demand
