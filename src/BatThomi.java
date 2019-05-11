@@ -15,7 +15,6 @@ public class BatThomi {
         for (int i = 0;i< boats.length;i++) {
             place_boat(boats[i]);
         }
-        print();
 
     }
 
@@ -36,14 +35,14 @@ public class BatThomi {
     public int[] peekabo()
     {
         //init to 0 already
-        int[100] view;
+        int[] view = new int[100];
 
         for(int i =0;i<100;i++)
         {
             //touché
             if(grid[i%10][(i/10)%10] >0)
                 view[i] = 1;
-            //plouf
+                //plouf
             else if(grid[i%10][(i/10)%10] ==0)
                 view[i] = 2;
         }
@@ -51,7 +50,7 @@ public class BatThomi {
         return view;
     }
 
-    public boolean boom(id)
+    public boolean boom(int id)
     {
         int posx = id%10;
         int posy = (id/10)%10;
@@ -65,7 +64,7 @@ public class BatThomi {
 
     public void populate() {
         grid = new int [10][10];
-        grid = Arrays.fill(8);
+        Arrays.fill(grid,8);
     }
 
     public void place_boat(int badassery)
