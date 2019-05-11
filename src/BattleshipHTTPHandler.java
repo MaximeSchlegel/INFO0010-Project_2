@@ -121,6 +121,7 @@ public class BattleshipHTTPHandler implements Runnable{
                     headerOut.flush();
 
                 } else if (httpQuerry.equals("/play.html")) {
+                    System.out.println("Got the request");
                     //proc the launch of the game
                     String response = "Play";
                     //String id = Cookie.get();
@@ -129,11 +130,13 @@ public class BattleshipHTTPHandler implements Runnable{
                         this.Game = this.master.cookieManager.getGame(this.cookie);
                     }
                     else{
+                        System.out.println("Inside the cookie :p");
                         Pair<String, BatThomi> p = this.master.cookieManager.getNewGame();
+                        System.out.println("Outside the cookie :p");
                         this.cookie = p.getKey();
                         this.Game = p.getValue();
                     }
-
+                    System.out.println("Got the cookies figured out");
                     // send HTTP Headers
                     headerOut.println("HTTP/1.1 200 OK");
                     headerOut.println("Server: " + httpHost);
@@ -234,13 +237,13 @@ public class BattleshipHTTPHandler implements Runnable{
         play_html += "<body>\r\n";
         play_html += "<h1>Play</h1>\r\n";
         play_html += "<script type=\"text/javascript\">\r\n";
-        play_html += "var gamestate = " + this.Game.peekabou().toString() + "\r\n";
+        play_html += "var gamestate = " + java.util.Arrays.toString(this.Game.peekabou()) + ";\r\n";
         play_html += "        var background = new Image();\r\n";
-        play_html +=  "       background.src= data:image/png;base64," + this.master.wauta  + "\r\n";
+        play_html +=  "       background.src= \"data:image/png;base64," + this.master.wauta  + "\";\r\n";
         play_html += "        nuage = new Image();\r\n";
-        play_html += "       nuage.src = data:image/png;base64," + this.master.claudy + "\r\n";
+        play_html += "       nuage.src = \"data:image/png;base64," + this.master.claudy + "\";\r\n";
         play_html += "        explosion = new Image();\r\n";
-        play_html += "       explosion.src = data:image/png;base64," + this.master.explosion + "\r\n";
+        play_html += "       explosion.src = \"data:image/png;base64," + this.master.explosion + "\";\r\n";
         play_html += "        var context;\r\n";
         play_html += "        function charger(){\r\n";
         play_html += "        canvas = document.getElementById('field');\r\n";
@@ -319,7 +322,7 @@ public class BattleshipHTTPHandler implements Runnable{
 
         headerOut.println("Content-length: " + play_html.getBytes().length);
         headerOut.println(); // blank line between headers and content, very important !
-        headerOut.flush(); // flush character output stream buffer
+        //headerOut.flush(); // flush character output stream buffer
 
         headerOut.print(play_html);
         headerOut.flush();
