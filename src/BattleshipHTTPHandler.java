@@ -31,6 +31,8 @@ public class BattleshipHTTPHandler extends Thread{
     private BattleshipHTTPServer master;
 
     private boolean verbose;
+    
+    BatThomi Game;
 
 
     public BattleshipHTTPHandler(Socket socket, BattleshipHTTPServer server) {
@@ -110,6 +112,14 @@ public class BattleshipHTTPHandler extends Thread{
                 } else if (httpQuerry.equals("/play.html")) {
                     //proc the launch of the game
                     String response = "Play";
+                    //String id = Cookie.get();
+                    String id = "";
+                    if(this.cookieManager.isUsed(id)){
+                        this.Game = this.master.cookieManager.getGame(id);
+                    }
+                    else{
+                        this.Game = this.master.cookieManager.getNewGame();
+                    }
 
                     // send HTTP Headers
                     headerOut.println("HTTP/1.1 200 OK");
