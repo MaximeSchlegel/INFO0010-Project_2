@@ -1,9 +1,9 @@
 //import java.util.ArrayList;
 //import java.util.Random;
 //
-//public class BattleshipGame {
-//    private int id;
-//    private int version;
+public class BattleshipGame {
+    private int id;
+    private int version;
 //
 //    private ArrayList<ArrayList<Byte>> ship;
 //    private ArrayList<byte[]> history;
@@ -112,4 +112,4 @@
 //    }
 //
 //
-//}
+}
