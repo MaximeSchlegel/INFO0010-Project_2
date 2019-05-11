@@ -15,7 +15,7 @@ public class BattleshipHTTPServer {
     private boolean verbose;
 
     //hold the id, score and date of completion of the best game
-    protected int[][] best_games;
+    protected HallOfFame best_games;
 
     //hold the on going games
     protected CookieManager cookieManager;
@@ -24,8 +24,8 @@ public class BattleshipHTTPServer {
     public BattleshipHTTPServer(int portNumber, boolean verbose) {
         this.portNumber = portNumber;
         this.verbose = verbose;
-        this.best_games = new int[10][3];
-        this.cookieManager = new CookieManager(true);
+        this.best_games = new HallOfFame();
+        this.cookieManager = new CookieManager();
     }
 
     private void launch() throws Exception {
