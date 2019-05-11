@@ -3,6 +3,9 @@ import java.net.Socket;
 import java.util.Date;
 
 public class BattleshipHTTPHandler extends Thread{
+    //version of the game
+    private static final int VERSION = 2;
+
     //web folder and files to return
     private static final File WEB_ROOT = new File("./web/");
     private static final String DEFAULT_FILE = "play.html";
@@ -13,7 +16,8 @@ public class BattleshipHTTPHandler extends Thread{
 
     //connection socket
     private Socket socket;
-    //ref server
+
+    //reference server for hightscore and saved games
     private BattleshipHTTPServer server;
 
     public BattleshipHTTPHandler(Socket socket, BattleshipHTTPServer server) {
@@ -53,8 +57,19 @@ public class BattleshipHTTPHandler extends Thread{
 
             dataOut.write(response.getBytes(), 0, response.getBytes().length);
             dataOut.flush();
+
         } catch (Exception e){
             e.printStackTrace();
         }
     }
 }
+
+//TODO: test the version of the incomming demand
+//TODO: test the method used
+//TODO: test the page demand
+//TODO: test the cookie
+//      => if exist: load the game
+//      => create a new game and a new cookie
+//TODO: Game data structure
+//TODO: write the answer
+//TODO:

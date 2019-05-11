@@ -7,12 +7,16 @@ import java.util.Map;
 public class BattleshipHTTPServer {
     //version of the game
     private static final int VERSION = 2;
+
     //port to listen connection
-    private int portNumber = 2511;
+    private int portNumber;
+
     // verbose mode
     private boolean verbose = true;
+
     //hold the id, score and date of completion of the best game
     protected int[][] best_games;
+
     //hold the on goinging games
     protected Map<Integer, Integer> saved_games;
 
@@ -26,6 +30,7 @@ public class BattleshipHTTPServer {
 
     private void launch () throws Exception {
         try {
+            //create the server socket listening on the gien port
             ServerSocket serverSocket = new ServerSocket(this.portNumber);
 
             if (this.verbose) {
@@ -33,6 +38,7 @@ public class BattleshipHTTPServer {
                 System.out.println("Listening for connections on port : " + this.portNumber + " ...\n");
             }
 
+            //listen the socket until the server is shutdown
             while (true) {
                 Socket socket = serverSocket.accept();
 
@@ -40,6 +46,7 @@ public class BattleshipHTTPServer {
                     System.out.println("Connection opened. (" + new Date() + ")");
                 }
 
+                //create the worker to handle the connection
                 BattleshipHTTPHandler worker = new BattleshipHTTPHandler(socket, this);
                 worker.start();
 
@@ -78,7 +85,7 @@ public class BattleshipHTTPServer {
         try{
             server.launch();
         } catch (Exception e) {
-            System.err.println("Server Connection error : " + e.getMessage());
+            System.err.println("Server Connection error : " + e.getMessage() + "\n");
             e.printStackTrace();
             System.exit(1);
         }
