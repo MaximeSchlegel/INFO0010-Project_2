@@ -63,7 +63,7 @@ public class myHTTPServer extends Thread {
                 for(int j = 0; j < 10; j++)
                     //responseBuffer.append("<button class ='tile p" + i + "" + j + "'></button>");
                     responseBuffer.append("<input type='submit'" +
-                            "value = ' "+ i +""+ j +"'" +
+                            "value = ''" +
                             "name = ''" +
                             "style = '" +
                             " background: url(Water.jpg) no-repeat;" +
