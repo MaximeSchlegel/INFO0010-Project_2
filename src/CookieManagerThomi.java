@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class CookieManager {
+public class CookieManagerThomi {
     /*Handle the loading and saving of game linked to a cookie id
     * Generate the cookie id and new game*/
     private Map<String, BattleshipGame> saved_game;
