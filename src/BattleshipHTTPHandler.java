@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.Socket;
 import java.util.Date;
+import java.util.StringTokenizer;
 
 public class BattleshipHTTPHandler extends Thread{
     //version of the game
@@ -28,6 +29,7 @@ public class BattleshipHTTPHandler extends Thread{
 
     @Override
     public void run() {
+
         BufferedReader in = null;
         PrintWriter out = null;
         BufferedOutputStream dataOut = null;
@@ -37,26 +39,85 @@ public class BattleshipHTTPHandler extends Thread{
         try {
             // we read characters from the client via input stream on the socket
             in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-
             // we get character output stream to client (for headers)
             out = new PrintWriter(this.socket.getOutputStream());
+//            // get binary output stream to client (for requested data)
+//            dataOut = new BufferedOutputStream(this.socket.getOutputStream());
 
-            // get binary output stream to client (for requested data)
-            dataOut = new BufferedOutputStream(this.socket.getOutputStream());
+            String request = in.readLine(); //get the first line of the request => method and target ressource
+            StringTokenizer parser = new StringTokenizer(request); // parse the line to get the token
+            String method = parser.nextToken();
+            System.out.println(method);
 
-            String response = "Hello World !";
+            String host = in.readLine();
+            StringTokenizer parser = new StringTokenizer(request); // parse the line to get the token
 
-            // send HTTP Headers
-            out.println("HTTP/1.1 200 OK");
-            out.println("Server:" + " localhost:2511");
-            out.println("Date: " + new Date());
-            out.println("Content-type: " + "text/html");
-            out.println("Content-length: " + response.getBytes().length);
-            out.println(); // blank line between headers and content, very important !
-            out.flush(); // flush character output stream buffer
 
-            dataOut.write(response.getBytes(), 0, response.getBytes().length);
-            dataOut.flush();
+            if (method.equals("GET")) {
+                String target = parser.nextToken();
+                System.out.println(target);
+
+                if (target.equals("/")) {
+                    //if the client required the root, we redirect him on the play page
+                    out.println("HTTP/1.1 303 See Other");
+                    out.println("Server:" + " localhost:2511");
+                    out.println("Date: " + new Date());
+                    out.println("Location: " + "localhost:2511" + "/play.html");
+                    out.println("Content-length: 0");
+                    out.println();
+                    out.flush();
+
+                } else if (target.equals("/play.html")) {
+                    //proc the launch of the game
+
+                } else if (target.equals("/hall_of_fame.html")) {
+                    //return the hall of fame page
+
+                } else {
+                    //this page does not exist
+                    out.println("HTTP/1.1 404 Not Found");
+                    out.println("Server:" + " localhost:2511");
+                    out.println("Date: " + new Date());
+                    out.println("Content-length: 0");
+                    out.println();
+                    out.flush();
+                }
+
+//                while (parser.hasMoreTokens()) {
+//                    String token = parser.nextToken();
+//                    System.out.println(token);
+//                }
+
+            } else if (method.equals("POST")) {
+
+            } else {
+                out.println("HTTP/1.1 405 Method Not Allowed");
+                out.println("Server:" + " localhost:2511");
+                out.println("Date: " + new Date());
+                out.println("Content-length: 0");
+                out.println();
+                out.flush();
+
+//                dataOut.write(response.getBytes(), 0, response.getBytes().length);
+//                dataOut.flush();
+            }
+
+
+
+//            String response = "Hello World !";
+//
+//            // send HTTP Headers
+//            out.println("HTTP/1.1 200 OK");
+//            out.println("Server:" + " localhost:2511");
+//            out.println("Date: " + new Date());
+//            out.println("Content-type: " + "text/html");
+//            out.println("Content-length: " + response.getBytes().length);
+//            out.println("Set-Cookie: " + "Battleship=" + "123456789");
+//            out.println(); // blank line between headers and content, very important !
+//            out.flush(); // flush character output stream buffer
+//
+//            dataOut.write(response.getBytes(), 0, response.getBytes().length);
+//            dataOut.flush();
 
         } catch (Exception e){
             e.printStackTrace();
