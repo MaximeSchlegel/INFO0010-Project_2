@@ -87,8 +87,8 @@ public class BattleshipHTTPHandler extends Thread{
             System.out.println("Host :" + httpHost);
 
             //get the cookie name ???
-            String hostLine = inFromClient.readLine(); //get the second line to extract the host address
-            System.out.println("Cookie lline :" + Cookieline);
+            String CookieLine = inFromClient.readLine(); //get the second line to extract the host address
+            System.out.println("Cookie lline :" + CookieLine);
             //StringTokenizer hostTokenizer = new StringTokenizer(hostLine);
             //hostTokenizer.nextToken();
             //String httpHost = hostTokenizer.nextToken();
