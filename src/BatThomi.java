@@ -32,7 +32,7 @@ public class BatThomi {
         return true;
     }
 
-    public int[] peekabo()
+    public int[] peekabou()
     {
         //init to 0 already
         int[] view = new int[100];
@@ -64,7 +64,11 @@ public class BatThomi {
 
     public void populate() {
         grid = new int [10][10];
-        Arrays.fill(grid,8);
+
+
+            for(int i = 0; i < 10; i++)
+                Arrays.fill(grid[i],8);
+
     }
 
     public void place_boat(int badassery)

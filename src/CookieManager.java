@@ -1,14 +1,17 @@
 import javafx.util.Pair;
-
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+
 
 public class CookieManager {
     /*Handle the loading and saving of game linked to a cookie id
     * Generate the cookie id and new game*/
     private Map<String, BatThomi> saved_game;
     private String cookieCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" + "0123456789"; //length = 62
+
 
     public CookieManager() {
         this.saved_game = new HashMap<>();

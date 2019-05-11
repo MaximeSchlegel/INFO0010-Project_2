@@ -2,6 +2,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Date;
 import java.util.StringTokenizer;
+import javafx.util.Pair;
 
 
 public class BattleshipHTTPHandler extends Thread{
@@ -127,12 +128,14 @@ public class BattleshipHTTPHandler extends Thread{
                     //proc the launch of the game
                     String response = "Play";
                     //String id = Cookie.get();
-                    String id = "";
-                    if(this.cookieManager.isUsed(id)){
-                        this.Game = this.master.cookieManager.getGame(id);
+
+                    if(this.master.cookieManager.isUsed(this.cookie)){
+                        this.Game = this.master.cookieManager.getGame(this.cookie);
                     }
                     else{
-                        this.Game = this.master.cookieManager.getNewGame();
+                        Pair<String, BatThomi> p = this.master.cookieManager.getNewGame();
+                        this.cookie = p.getKey();
+                        this.Game = p.getValue();
                     }
 
                     // send HTTP Headers
@@ -140,17 +143,11 @@ public class BattleshipHTTPHandler extends Thread{
                     headerOut.println("Server: " + httpHost);
                     headerOut.println("Date: " + new Date());
                     headerOut.println("Content-type: " + "text/html");
-                    headerOut.println("Content-length: " + response.getBytes().length);
-                    headerOut.println("Set-Cookie: " + "Battleship=" + "123456789");
-                    headerOut.println(); // blank line between headers and content, very important !
-                    headerOut.flush(); // flush character output stream buffer
 
-                    headerOut.println(response);
-                    headerOut.flush();
-
-
+                    //replace here with sessionid
+                    headerOut.println("Set-Cookie: " + "Battleship=" + this.cookie);
                     /////
-
+                    printPlay();
 
                     /////
                 } else if (httpQuerry.equals("/hall_of_fame.html")) {
@@ -165,11 +162,7 @@ public class BattleshipHTTPHandler extends Thread{
                     headerOut.println("Content-type: " + "text/html");
                     headerOut.println("Content-length: " + response.getBytes().length);
                     headerOut.println("Set-Cookie: " + "Battleship=" + "123456789");
-                    headerOut.println(); // blank line between headers and content, very important !
-                    headerOut.flush(); // flush character output stream buffer
 
-                    headerOut.println(response);
-                    headerOut.flush();
 
                 } else {
                     //this page does not exist
@@ -243,6 +236,108 @@ public class BattleshipHTTPHandler extends Thread{
         }
     }
 
+    private void printPlay()
+    {
+        String play_html = "";
+        play_html += "<!DOCTYPE html>\r\n";
+        play_html += "<html lang=\"en\">\r\n";
+        play_html += "<head>\r\n";
+        play_html += "<meta charset=\"UTF-8\">\r\n";
+        play_html += "<title>Battleship - Play</title>\r\n";
+        play_html += "</head>\r\n";
+        play_html += "<body>\r\n";
+        play_html += "<h1>Play</h1>\r\n";
+        play_html += "<script type=\"text/javascript\">\r\n";
+        play_html += "var gamestate = " + this.Game.peekabou().toString() + "\r\n";
+        play_html += "        var background = new Image();\r\n";
+        play_html +=  "       background.src= data:image/png;base64," + this.master.wauta  + "\r\n";
+        play_html += "        nuage = new Image();\r\n";
+        play_html += "       nuage.src = data:image/png;base64," + this.master.claudy + "\r\n";
+        play_html += "        explosion = new Image();\r\n";
+        play_html += "       explosion.src = data:image/png;base64," + this.master.explosion + "\r\n";
+        play_html += "        var context;\r\n";
+        play_html += "        function charger(){\r\n";
+        play_html += "        canvas = document.getElementById('field');\r\n";
+        play_html += "        context = canvas.getContext('2d');\r\n";
+        play_html += "        draw();\r\n";
+        play_html += "        canvas.style.display = 'block';\r\n";
+        play_html += "        }\r\n";
+        play_html += "        function draw(){\r\n";
+        play_html += "        context.drawImage(background,0,0,500,500);\r\n";
+        play_html += "        var x;\r\n";
+        play_html += "        var y;\r\n";
+        play_html += "        for(var id=0;id<100;id++)\r\n";
+        play_html += "        {\r\n";
+        play_html += "        switch(gamestate[id]){\r\n";
+        play_html += "\r\n";
+        play_html += "        case 0:\r\n";
+        play_html += "        //print nuage\r\n";
+        play_html += "        context.drawImage(nuage,((id%10))*50,Math.floor(id/10)*50,50,50);\r\n";
+        play_html += "        break;\r\n";
+        play_html += "        case 1:\r\n";
+        play_html += "        //print explosion\r\n";
+        play_html += "        context.drawImage(explosion,((id%10))*50,Math.floor(id/10)*50,50,50);\r\n";
+        play_html += "        break;\r\n";
+        play_html += "        //case 2:\r\n";
+        play_html += "        //print nothing\r\n";
+        play_html += "\r\n";
+        play_html += "\r\n";
+        play_html += "        }\r\n";
+        play_html += "        //print the corresponding picture on screen\r\n";
+        play_html += "        if(gamestate[id] ==0)\r\n";
+        play_html += "        //ici faut avoir un truc pour choisir quel image\r\n";
+        play_html += "        context.drawImage(nuage,(x)*50,(y)*50,50,50);\r\n";
+        play_html += "\r\n";
+        play_html += "        }\r\n";
+        play_html += "        }\r\n";
+        play_html += "        function shoot(){\r\n";
+        play_html += "        //get mouse coord\r\n";
+        play_html += "        var mx = event.clientX-  document.getElementById(\"field\").offsetLeft -  document.getElementById(\"parent\").offsetLeft + document.body.scrollLeft;";
+        play_html += "        var my = event.clientY- document.getElementById(\"field\").offsetTop -  document.getElementById(\"parent\").offsetTop + document.body.scrollTop;";
+        play_html += "\r\n";
+        play_html += "\r\n";
+        play_html += "\r\n";
+        play_html += "        //convertir en identité grid?\r\n";
+        play_html += "        var id = Math.floor(mx/50) + Math.floor(my/50)*10;\r\n";
+        play_html += "        alert(id);\r\n";
+        play_html += "\r\n";
+        play_html += "        //TODO: do ajax to send grid identity\r\n";
+        play_html += "        var request = new XMLHttpRequest();\r\n";
+        play_html += "\r\n";
+        play_html += "        request.onreadystatechange = function() {\r\n";
+        play_html += "        if (this.readyState == 4 && this.status == 200) {\r\n";
+        play_html += "        //change the gamestate\r\n";
+        play_html += "        gamestate(id) = parseInt(this.responseText);\r\n";
+        play_html += "        //redraw\r\n";
+        play_html += "        draw();\r\n";
+        play_html += "        }\r\n";
+        play_html += "        request.open(\"POST\", \"\", true);\r\n";
+        play_html += "        request.setRequestHeader(\"Content-type\", \"application/x-www-form-urlencoded\");\r\n";
+        play_html += "        request.send(\"id=\" + id);\r\n";
+        play_html += "        };\r\n";
+        play_html += "\r\n";
+        play_html += "        }\r\n";
+        play_html += "\r\n";
+        play_html += "        </script>\r\n";
+        play_html += "        <!-- faut remplacer les valeurs d'une facon ou d'une autre -->\r\n";
+        play_html += "        <div id=\"parent\" style=\"position: relative;max-width: 500px;max-height: 500px;\">\r\n";
+        play_html += "        <canvas id=\"field\"  style=\"position: relative;left: 10px;top: 0px;z-index: -1;\" width=\"500\" height=\"500\" ></canvas>\r\n";
+        play_html += "        </div>\r\n";
+        play_html += "\r\n";
+        play_html += "        <script type=\"text/javascript\">\r\n";
+        play_html += "        window.onload = charger;\r\n";
+        play_html += "        </script>\r\n";
+        play_html += "\r\n";
+        play_html += "        </body>\r\n";
+        play_html += "        </html>\r\n";
+
+        headerOut.println("Content-length: " + play_html.getBytes().length);
+        headerOut.println(); // blank line between headers and content, very important !
+        headerOut.flush(); // flush character output stream buffer
+
+        headerOut.print(play_html);
+        headerOut.flush();
+    }
 }
 
 //TODO: test the version of the incomming demand

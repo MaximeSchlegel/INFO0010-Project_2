@@ -3,6 +3,9 @@ import java.net.Socket;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.io.*;
+import javax.imageio.*;
+import java.util.Base64;
 
 public class BattleshipHTTPServer {
     //version of the game
@@ -21,11 +24,42 @@ public class BattleshipHTTPServer {
     protected CookieManager cookieManager;
 
 
-    public BattleshipHTTPServer(int portNumber, boolean verbose) {
+
+    //keep the pictures in base64 saved for all games
+    public String explosion;
+    public String wauta;
+    public String claudy;
+
+
+    public BattleshipHTTPServer(int portNumber, boolean verbose,String expl_dir,String wauta_dir,String claudy_dir) {
+
+        try {
+            //save the pictures in base 64
+            File fexpl = new File(expl_dir);
+            FileInputStream fin_expl = new FileInputStream(expl_dir);
+            byte[] bytes_expl = new byte[(int) fexpl.length()];
+            fin_expl.read(bytes_expl);
+            explosion = Base64.getEncoder().encodeToString(bytes_expl);
+
+            File fcloud = new File(claudy_dir);
+            FileInputStream fin_cloud = new FileInputStream(claudy_dir);
+            byte[] bytes_cloud = new byte[(int) fcloud.length()];
+            fin_cloud.read(bytes_cloud);
+            claudy = Base64.getEncoder().encodeToString(bytes_cloud);
+            File fwater = new File(wauta_dir);
+            FileInputStream fin_water = new FileInputStream(wauta_dir);
+            byte[] bytes_water = new byte[(int) fwater.length()];
+            fin_water.read(bytes_water);
+            wauta = Base64.getEncoder().encodeToString(bytes_water);
+        }
+        catch(Exception e){
+            System.out.println("Il y a eu un problème dans la lecture des fichiers images.");
+        }
+
         this.portNumber = portNumber;
         this.verbose = verbose;
         this.best_games = new int[10][3];
-        this.cookieManager = new CookieManager(true);
+        this.cookieManager = new CookieManager();
     }
 
     private void launch() throws Exception {
@@ -79,7 +113,7 @@ public class BattleshipHTTPServer {
             System.exit(1);
         }
 
-        BattleshipHTTPServer server = new BattleshipHTTPServer(portNumber, verbose);
+        BattleshipHTTPServer server = new BattleshipHTTPServer(portNumber, verbose, "Explosion.jpg","Wauta.jpg","Claudy.png");
 
         try {
             server.launch();
@@ -89,5 +123,4 @@ public class BattleshipHTTPServer {
             System.exit(1);
         }
     }
-
 }
