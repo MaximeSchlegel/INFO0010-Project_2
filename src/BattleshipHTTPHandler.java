@@ -99,7 +99,6 @@ public class BattleshipHTTPHandler extends Thread{
 
                 } else if (httpQuerry.equals("/play.html")) {
                     //proc the launch of the game
-
                     String response = "Play";
 
                     // send HTTP Headers
@@ -115,6 +114,11 @@ public class BattleshipHTTPHandler extends Thread{
                     headerOut.println(response);
                     headerOut.flush();
 
+
+                    /////
+
+
+                    /////
                 } else if (httpQuerry.equals("/hall_of_fame.html")) {
                     //return the hall of fame page
 
