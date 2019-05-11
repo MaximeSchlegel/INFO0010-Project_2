@@ -7,7 +7,7 @@ import java.util.Date;
 import java.util.StringTokenizer;
 
 
-public class BattleshipHTTPHandler extends Thread{
+public class BattleshipHTTPHandler implements Runnable{
     //version of the game
     private static final int VERSION = 2;
 
@@ -41,8 +41,6 @@ public class BattleshipHTTPHandler extends Thread{
     private String cookie;
 
     public BattleshipHTTPHandler(Socket socket, BattleshipHTTPServer server) {
-        super("BattleshipHTTPHandler");
-
         //initialize the io
         this.connectedClient = socket;
         this.inFromClient = null;
@@ -56,8 +54,6 @@ public class BattleshipHTTPHandler extends Thread{
     }
 
     public BattleshipHTTPHandler(Socket socket, BattleshipHTTPServer server, boolean verbose) {
-        super("BattleshipHTTPHandler");
-
         //initialize the io
         this.connectedClient = socket;
         this.inFromClient = null;
@@ -72,7 +68,6 @@ public class BattleshipHTTPHandler extends Thread{
         }
     }
 
-    @Override
     public void run() {
         try {
             this.inFromClient = new BufferedReader(new InputStreamReader(this.connectedClient.getInputStream()));
@@ -244,7 +239,7 @@ public class BattleshipHTTPHandler extends Thread{
             "   <body>\n" +
             "       <h1>Hall of Fame</h1>\n");
 
-        ArrayList<Pair<String, Integer>> halloffame = this.master.best_games.getScore();
+        ArrayList<Pair<String, Integer>> halloffame = this.master.bestGames.getScore();
         if (halloffame.size() == 0) {
             responseBuilder.append("Nobody beat the game. Try it !");
         } else {
