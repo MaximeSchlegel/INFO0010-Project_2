@@ -86,6 +86,16 @@ public class BattleshipHTTPHandler extends Thread{
             String httpHost = hostTokenizer.nextToken();
             System.out.println("Host :" + httpHost);
 
+            //get the cookie name ???
+            String hostLine = inFromClient.readLine(); //get the second line to extract the host address
+            System.out.println("Cookie lline :" + Cookieline);
+            //StringTokenizer hostTokenizer = new StringTokenizer(hostLine);
+            //hostTokenizer.nextToken();
+            //String httpHost = hostTokenizer.nextToken();
+            //System.out.println("Host :" + httpHost);
+
+
+
             if (httpMethod.equals("GET")) {
                 if (httpQuerry.equals("/")) {
                     //if the client required the root, we redirect him on the play page
