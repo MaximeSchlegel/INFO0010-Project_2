@@ -2,40 +2,51 @@ import javafx.util.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class CookieManagerThomi {
     /*Handle the loading and saving of game linked to a cookie id
     * Generate the cookie id and new game*/
-    private int last_cookie_id;
-    private Map<String, BatThomi> saved_games;
+    private Map<String, BatThomi> saved_game;
+    private String cookieCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" + "0123456789"; //length = 62
 
-    public CookieManagerThomi() {
-        this.last_cookie_id = 0;
-        this.saved_games = new HashMap<>();
+    public CookieManager() {
+        this.saved_game = new HashMap<>();
     }
 
     public boolean isUsed(String id) {
-        if (Integer.parseInt(id) > this.last_cookie_id) {
-            return false;
-        }
-        return this.saved_games.containsKey(id);
+        return this.saved_game.containsKey(id);
     }
 
-    public Pair<String, BatThomi> getNewGame() {
-        this.last_cookie_id++;
-        String id = Integer.toString(this.last_cookie_id);
+    public BattleshipGame getNewGame() {
+        Random rand = new Random();
+        String id = "";
+        while(this.isUsed(id)) {
+            id = "";
+            for (int i = 0; i < 26; i++)
+                id += cookieCharacters.charAt(rand.nextInt(cookieCharacters.length()));
+        }
+
         BatThomi newGame = new BatThomi();
-        this.saved_games.put(id, newGame);
-        return new Pair<>(id, newGame);
+        this.saved_game.put(id, newGame);
+        return newGame;
+    }
+
+    public BatThomi getGame(String id){
+        if(this.isUsed(id))
+            return this.saved_game.get(id);
+        return null;
     }
 
     public BatThomi loadGame(String id) {
-        return this.saved_games.get(id);
+        return this.saved_game.get(id);
     }
 
     public void delete(String id) {
-        this.saved_games.remove(id);
+        this.saved_game.remove(id);
     }
 
 }
+
+
 
