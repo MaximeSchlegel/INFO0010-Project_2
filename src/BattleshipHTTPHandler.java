@@ -189,21 +189,20 @@ public class BattleshipHTTPHandler implements Runnable{
                     if(!id_from_get.equals("")) {
                         //got get from javascript ajax need only to send one number
                         try {
-
-                            if(this.Game.getNmbTries() >=70){
-                                headerOut.println("HTTP/1.1 303 See Other");
-                                headerOut.println("Server: " + SERVER_DETAILS);
-                                headerOut.println("Date: " + new Date());
-                                headerOut.println("Location: " + "http://" +httpHost + "/hall_of_fame.html");
-                                headerOut.println("Connection: close");
-                                headerOut.println("Content-length: 0");
-                                headerOut.println();
-                                headerOut.flush();
-                            }
-                            else {
                                 int id = Integer.parseInt(id_from_get);
+
                                 //first update gamestate
                                 int value = this.Game.boom(id);
+                                if(this.Game.getNmbTries() >=70){
+                                    headerOut.println("HTTP/1.1 303 See Other");
+                                    headerOut.println("Server: " + SERVER_DETAILS);
+                                    headerOut.println("Date: " + new Date());
+                                    headerOut.println("Location: " + "http://" +httpHost + "/hall_of_fame.html");
+                                    headerOut.println("Connection: close");
+                                    headerOut.println("Content-length: 0");
+                                    headerOut.println();
+                                    headerOut.flush();
+                                }
                                 for(int i =0;i<this.Game.peekabou().length;i++)
                                     System.out.print(this.Game.peekabou()[i]+" ");
                                 if(this.Game.check_win()) {
@@ -235,7 +234,6 @@ public class BattleshipHTTPHandler implements Runnable{
                                     headerOut.print(value);
                                     headerOut.flush();
                                 }
-                            }
                         } catch (Exception e) {
                             System.out.println("Wrong variable through GET: " + e);
                         }
