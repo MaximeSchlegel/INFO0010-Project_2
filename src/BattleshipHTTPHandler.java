@@ -258,6 +258,12 @@ public class BattleshipHTTPHandler implements Runnable{
                     if (this.verbose) {
                         System.out.println("Got GET resquest for /hall_of_fame.html");
                     }
+                    // send HTTP Headers
+                    this.headerOut.println("HTTP/1.1 200 OK");
+                    this.headerOut.println("Server: " + SERVER_DETAILS);
+                    this.headerOut.println("Date: " + new Date());
+                    this.headerOut.println("Content-type: " + "text/html");
+                    this.headerOut.println("Connection: close");
                     //return the hall of fame page
                     this.sendHallOfFame();
 
@@ -407,6 +413,7 @@ public class BattleshipHTTPHandler implements Runnable{
                     String tmp = new String(resquest);
                     System.out.println(tmp);
                     String name = (tmp.split("=")[1]);
+                    System.out.println("NAME : " + name);
 
                     //check if he really won
                     if(this.Game.check_win()) {
