@@ -15,16 +15,12 @@ public class BattleshipHTTPServer {
 
     //port to listen connection
     private int portNumber;
-
     // verbose mode
     private boolean verbose;
-
     //hold the id, score and date of completion of the best game
     protected HallOfFame bestGames;
-
     //hold the on going games
     protected CookieManager cookieManager;
-
     //Thread pool to execute client request
     private ExecutorService threadPool;
 
@@ -33,38 +29,39 @@ public class BattleshipHTTPServer {
     public String explosion;
     public String wauta;
     public String claudy;
+    private static final File WEB_ROOT = new File("./web/");
 
-
-    public BattleshipHTTPServer(int threadPoolSize, int portNumber, boolean verbose,String expl_dir,String wauta_dir,String claudy_dir) {
-
+    public BattleshipHTTPServer(int threadPoolSize, int portNumber, boolean verbose,
+                                String expl_dir, String wauta_dir, String claudy_dir) {
         try {
             //save the pictures in base 64
-            File fexpl = new File(expl_dir);
-            FileInputStream fin_expl = new FileInputStream(expl_dir);
+            File fexpl = new File(WEB_ROOT, expl_dir);
+            FileInputStream fin_expl = new FileInputStream(fexpl);
             byte[] bytes_expl = new byte[(int) fexpl.length()];
             fin_expl.read(bytes_expl);
-            explosion = Base64.getEncoder().encodeToString(bytes_expl);
+            this.explosion = Base64.getEncoder().encodeToString(bytes_expl);
 
-            File fcloud = new File(claudy_dir);
-            FileInputStream fin_cloud = new FileInputStream(claudy_dir);
+            File fcloud = new File(WEB_ROOT, claudy_dir);
+            FileInputStream fin_cloud = new FileInputStream(fcloud);
             byte[] bytes_cloud = new byte[(int) fcloud.length()];
             fin_cloud.read(bytes_cloud);
-            claudy = Base64.getEncoder().encodeToString(bytes_cloud);
-            File fwater = new File(wauta_dir);
-            FileInputStream fin_water = new FileInputStream(wauta_dir);
+            this.claudy = Base64.getEncoder().encodeToString(bytes_cloud);
+
+            File fwater = new File(WEB_ROOT, wauta_dir);
+            FileInputStream fin_water = new FileInputStream(fwater);
             byte[] bytes_water = new byte[(int) fwater.length()];
             fin_water.read(bytes_water);
-            wauta = Base64.getEncoder().encodeToString(bytes_water);
+            this.wauta = Base64.getEncoder().encodeToString(bytes_water);
         }
         catch(Exception e){
             System.out.println(e + "Il y a eu un problème dans la lecture des fichiers images.");
         }
 
-                this.threadPool = Executors.newFixedThreadPool(threadPoolSize);
-                this.portNumber = portNumber;
-                this.verbose = verbose;
-                this.bestGames = new HallOfFame();
-                this.cookieManager = new CookieManager();
+        this.threadPool = Executors.newFixedThreadPool(threadPoolSize);
+        this.portNumber = portNumber;
+        this.verbose = verbose;
+        this.bestGames = new HallOfFame();
+        this.cookieManager = new CookieManager();
     }
 
     private void launch() throws Exception {
@@ -86,7 +83,7 @@ public class BattleshipHTTPServer {
                 }
 
                         //create the worker to handle the connection
-                        BattleshipHTTPHandler worker = new BattleshipHTTPHandler(socket, this);
+                        BattleshipHTTPHandler worker = new BattleshipHTTPHandler(socket, this, this.verbose);
                         this.threadPool.execute(worker);
 
                 if (verbose) {
@@ -123,7 +120,8 @@ public class BattleshipHTTPServer {
             System.exit(1);
         }
 
-        BattleshipHTTPServer server = new BattleshipHTTPServer(threadPoolSize, portNumber, verbose,"Explosion.jpg","Wauta.jpg","Claudy.png");
+        BattleshipHTTPServer server = new BattleshipHTTPServer(threadPoolSize, portNumber, verbose,
+                "Explosion.jpg","Wauta.jpg","Claudy.png");
 
         try {
             server.launch();

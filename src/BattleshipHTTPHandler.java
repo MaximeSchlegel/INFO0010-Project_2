@@ -102,7 +102,7 @@ public class BattleshipHTTPHandler implements Runnable{
             hostTokenizer.nextToken();
             String httpHost = hostTokenizer.nextToken();
 
-            //get the cookie name ???
+            //get the cookie name
             String Cookieline = inFromClient.readLine(); //get the second line to extract the host address
             StringTokenizer CookieTokenizer = new StringTokenizer(Cookieline);
             String iscookie = CookieTokenizer.nextToken();
@@ -157,17 +157,10 @@ public class BattleshipHTTPHandler implements Runnable{
                         System.out.println("Got GET resquest for /play.html");
                     }
 
-
-                    //proc the launch of the game
-                    //String id = Cookie.get();
-
-                    if(this.master.cookieManager.isUsed(this.cookie)){
+                    if (this.master.cookieManager.isUsed(this.cookie)) {
                         this.Game = this.master.cookieManager.getGame(this.cookie);
-                    }
-                    else{
-                        System.out.println("Inside the cookie :p");
+                    } else {
                         Pair<String, BatThomi> p = this.master.cookieManager.getNewGame();
-                        System.out.println("Outside the cookie :p");
                         this.cookie = p.getKey();
                         this.Game = p.getValue();
                     }
@@ -201,13 +194,12 @@ public class BattleshipHTTPHandler implements Runnable{
                         headerOut.println("Server: " + httpHost);
                         headerOut.println("Date: " + new Date());
                         headerOut.println("Content-type: " + "text/html");
-
-                        //replace here with sessionid
-                        headerOut.println("Set-Cookie: " + "Battleship=" + this.cookie);
-                        /////
-                        printPlay();
+                        if (this.verbose) {
+                            System.out.println("Got the cookies figured out");
+                            System.out.println("Cookie: " + this.cookie);
+                        }
+                        sendPlay();
                     }
-                    /////
                 } else if (httpQuerry.equals("/hall_of_fame.html")) {
                     if (this.verbose) {
                         System.out.println("Got GET resquest for /hall_of_fame.html");
@@ -289,7 +281,7 @@ public class BattleshipHTTPHandler implements Runnable{
         }
     }
 
-    private void printPlay() throws IOException {
+    private void sendPlay() throws IOException {
         String play_html = "";
         play_html += "<!DOCTYPE html>\r\n";
         play_html += "<html lang=\"en\">\r\n";
@@ -373,13 +365,19 @@ public class BattleshipHTTPHandler implements Runnable{
         play_html += "        </body>\r\n";
         play_html += "        </html>\r\n";
 
-        headerOut.println("Content-length: " + play_html.getBytes().length);
-        headerOut.println(); // blank line between headers and content, very important !
-        headerOut.flush(); // flush character output stream buffer
+        this.headerOut.println("HTTP/1.1 200 OK");
+        this.headerOut.println("Server: " + SERVER_DETAILS);
+        this.headerOut.println("Date: " + new Date());
+        this.headerOut.println("Content-type: " + "text/html");
+        headerOut.println("Set-Cookie: " + "Battleship=" + this.cookie);
+        this.headerOut.println("Content-length: " + play_html.getBytes().length);
+        this.headerOut.println();
+        this.headerOut.flush();
 
-        headerOut.print(play_html);
-        headerOut.flush();
+        this.dataOut.write(play_html.getBytes(), 0, play_html.getBytes().length);
+        this.dataOut.flush();
     }
+
     private void sendHallOfFame() throws IOException {
         StringBuilder responseBuilder = new StringBuilder();
         responseBuilder.append(
