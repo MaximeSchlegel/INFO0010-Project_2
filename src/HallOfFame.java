@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import javafx.util.Pair;
 
 public class HallOfFame {
-    private ArrayList<Pair<String, Integer>> bestScores;
+    private ArrayList<Pair<String,Pair<String,Integer>>> bestScores;
 
     private static final int SIZE = 10;
 
@@ -10,11 +10,11 @@ public class HallOfFame {
         this.bestScores = new ArrayList<>();
     }
 
-    public void addScore(String id, int score) {
+    public void addScore(String cookie, String id, int score) {
         int i = 0;
         for (i=0; i < this.bestScores.size(); i++) {
-            if (score > this.bestScores.get(i).getValue()) {
-                this.bestScores.add(i, new Pair<>(id, score));
+            if (score > this.bestScores.get(i).getValue().getValue()) {
+                this.bestScores.add(i, new Pair<>(cookie,new Pair<>(id,score)));
                 if (this.bestScores.size() > SIZE) {
                     this.bestScores.remove(SIZE);
                 }
@@ -23,10 +23,10 @@ public class HallOfFame {
         }
         //le mettre dedans a la fin
         if(i < SIZE)
-            this.bestScores.add( new Pair<>(id, score));
+            this.bestScores.add( new Pair<>(cookie,new Pair<>(id,score)));
     }
 
-    public ArrayList<Pair<String, Integer>> getScore() {
+    public ArrayList<Pair<String,Pair<String,Integer>>> getScore() {
         return this.bestScores;
     }
 }
