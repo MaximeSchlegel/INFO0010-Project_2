@@ -119,11 +119,11 @@ public class BattleshipHTTPServer {
         /*
          * Main method accept up to 3 args
          * args[0] => number of threads (default 10)
-         * args[1] => port to listen on (default 8000)
+         * args[1] => port to listen on (default 8041)
          * args[2] => verbose mode (default true)
          */
         int threadPoolSize = 10;
-        int portNumber = 8000;
+        int portNumber = 8041;
         boolean verbose = true;
 
         if (args.length == 1) {

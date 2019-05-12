@@ -77,7 +77,6 @@ public class BattleshipHTTPHandler implements Runnable{
             String id_from_get = "";
             //parse get if there is any
             //parse cookie
-            System.out.println("httprequest: "+httpQuerry);
 
             //did we get variables with the get ?
             if(httpQuerry.indexOf('?') >=0) {
@@ -96,7 +95,6 @@ public class BattleshipHTTPHandler implements Runnable{
                         id_from_get = "";
                     }
                 }
-                System.out.println("id_from= " + id_from_get);
             }
 
             //get the host name
@@ -114,11 +112,8 @@ public class BattleshipHTTPHandler implements Runnable{
             String contentLengthLine = null;
 
             while(!iscookie.equals("Cookie:")) {
-                System.out.println("Cookie lline :" + iscookie);
                 if (iscookie.equals("Content-Length:")) {
                     contentLengthLine = Cookieline;
-                    System.out.println(Cookieline);
-                    System.out.println(contentLengthLine);
                 }
                 Cookieline = inFromClient.readLine(); //get the second line to extract the host address
                 CookieTokenizer = new StringTokenizer(Cookieline);
@@ -144,7 +139,6 @@ public class BattleshipHTTPHandler implements Runnable{
                 }
             }
             String putCookie = "";
-            System.out.println("Cookie: " + this.cookie);
             if (this.master.cookieManager.isUsed(this.cookie)) {
                 this.Game = this.master.cookieManager.getGame(this.cookie);
             } else {
@@ -273,7 +267,6 @@ public class BattleshipHTTPHandler implements Runnable{
                     }
                     //first check if he won
                     if(this.Game.check_win()) {
-
                         //return the hall of fame page
                         this.sendWin();
                     }
@@ -744,13 +737,3 @@ public class BattleshipHTTPHandler implements Runnable{
         this.dataOut.flush();
     }
 }
-
-//TODO: test the version of the incomming demand
-//TODO: test the method used
-//TODO: test the page demand
-//TODO: test the cookie
-//      => if exist: load the game
-//      => create a new game and a new cookie
-//TODO: Game data structure
-//TODO: write the answer
-//TODO:
