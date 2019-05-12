@@ -58,7 +58,8 @@ public class BatThomi {
 
         if(grid[posx][posy] == 8)
             grid[posx][posy] = 0;
-        grid[posx][posy] = -grid[posx][posy];
+        if(grid[posx][posy] > 0)
+            grid[posx][posy] = -grid[posx][posy];
         nmb_tries++;
 
         return -grid[posx][posy];
