@@ -334,6 +334,7 @@ public class BattleshipHTTPHandler implements Runnable{
         play_html += "        explosion = new Image();\r\n";
         play_html += "       explosion.src = \"data:image/png;base64," + this.master.explosion + "\";\r\n";
         play_html += "        var context;\r\n";
+        play_html += "        var score = " + (70 - this.Game.getNmbTries()) + "\r\n";
         play_html += "        function charger(){\r\n";
         play_html += "        canvas = document.getElementById('field');\r\n";
         play_html += "        context = canvas.getContext('2d');\r\n";
@@ -341,6 +342,7 @@ public class BattleshipHTTPHandler implements Runnable{
         play_html += "        canvas.style.display = 'block';\r\n";
         play_html += "        }\r\n";
         play_html += "        function draw(){\r\n";
+        play_html += "        document.getElementById(\"score\").innerHTML = \"Number of turns left : \" + score;\r\n";
         play_html += "        context.drawImage(background,0,0,500,500);\r\n";
         play_html += "        var x;\r\n";
         play_html += "        var y;\r\n";
@@ -375,6 +377,7 @@ public class BattleshipHTTPHandler implements Runnable{
         play_html += "        //change the gamestate\r\n";
         play_html += "        gamestate[id] = parseInt(this.responseText);\r\n";
         play_html += "        //redraw\r\n";
+        play_html += "        score--;;\r\n";
         play_html += "        draw();\r\n";
         play_html += "        }\r\n";
         play_html += "        };\r\n";
@@ -389,6 +392,7 @@ public class BattleshipHTTPHandler implements Runnable{
         play_html += "        <!-- faut remplacer les valeurs d'une facon ou d'une autre -->\r\n";
         play_html += "        <div id=\"parent\" style=\"position: relative;max-width: 500px;max-height: 500px;\">\r\n";
         play_html += "        <canvas id=\"field\"  style=\"display: none;position: relative;left: 10px;top: 0px;z-index: 1;\" width=\"500\" height=\"500\" ></canvas>\r\n";
+        play_html += "        <p id=\"score\">Number of turns left : 70</p>\r\n";
         play_html += "        </div>\r\n";
         play_html += "\r\n";
         play_html += "        <script type=\"text/javascript\">\r\n";
@@ -466,7 +470,7 @@ public class BattleshipHTTPHandler implements Runnable{
                         "   <head>\n" +
                         "<link rel=\"icon\" type=\"image/jpg\" href=\"" + "data:image/png;base64,/9j/4QAWRXhpZgAATU0AKgAAAAgAAAAAAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gOTAK/9sAQwABAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB/9sAQwEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB/8AAEQgAGQAZAwEiAAIRAQMRAf/EABgAAAMBAQAAAAAAAAAAAAAAAAgJCgAH/8QAMRAAAQQCAQIDAg8AAAAAAAAABAIDBQYBBwAIEhETIQkUChYaMUFCU1hik5ei0dLX/8QAGAEAAgMAAAAAAAAAAAAAAAAABwgEBQb/xAAmEQABBAIBAwQDAQAAAAAAAAADAQIEBQYHERITFAAhIiMIFRdB/9oADAMBAAIRAxEAPwB8UYMO6p1+RnK/XI4dKHTp63WSKqtci2nimARlSdgnTAosD3yRMDjQUvEJdOkTBARkOkvtt5HXr5tO8NG9L+wLXpo6Dr+2F/EtrXlgnIQbYFYfanbjCAGy0XGhPlRNvEfhFSYwhIJB0eM4/k9zClBYSnlvtDNURO3ej3asXJ5U07R3aluOCd8xxDaJ/U1pjbUI2S2lXYSMaAzLxjoxCHWM5PS92YeYZdbRXp/qq2hqOryWs0HZuWnZV9Z7usbOUWVBV+wpbcSDd9ekIewbry7Rbi8utyNfW3DzTSno61wk5HkKS1mrrM241kNdW2Riw6e1hK2Rbwo3mWVOpivjOsQwynGGw8VFbJ8NzguKguhpVcvQ4v6I/GOw3RgeQ55jroN1kGDZdEB/PLuWWjp85r4sOBbmonZVE7srHpVux5awM5YcgIXHQxTRGMWQymrRm3ojfuldZ7lgg5SJB2DVQ5lyImQCImWgplh8qFtEBIRxLrz4hMDaombiFIceeUpsJt7Lq8Od3Oq+Yr7Vf5qv7cG/o9ldH3XQ7Fo0hds2eaKfas+7Kme5gK01LZEvHAC2mck6m8tZ4AdkPARJH2YV+WgLdLvF2ZmZzKyUxHiEF3p/H+7+eEmDcwLASyK6wBZx0I8KTorSCDKUL1H5DBF+4DToiGYA/wBwmEa0qI9rk9K7k2NXWK3lhR32P2uMWUM7kNRXbGfs61hFaQUSWRjBhklAJ6CdMjNSLLViyYvMcg1WRTbvwgm4bO1LsfWYnSrUYQi+U6bqjM0Rt+wyLMU7Lje7pOdj26KE4agfxyrIyTBlOemMPI+fis4zrNkMt4xNa0DS9hPquGuLq28r8fXKUSNbZcSn6U9zrisemM5+twK+bhpvdGa2yYoC2lIVxIwVCJ4LS1AqDUncVF6JvDuXqq+/PH+cemL1jufY2m4dhX68yBKOBbzmT7GI+sqLUUmYwDIzJCuuIE8oXIATB9McgWORqK5qr7+mM0br7I11boO7VOrXKHnII8QtomIuw8IQWIyUwQbCkSUYOgzETMMMqj5MVSCGCBX3POEIzhLWWt/KTbH9y+k/rVP/AObcmL5uSMZ0tr/GGTBVdTI6JZAvKkm0tJHyE1yN6OZjUZ8XqjuEVXcN5X4pxWbX2Vle65lPYbDlxbaXRR5USuPEroNM8ceYUBjDMtOCEslvcjscJJKlQCuKoe2pzK//2Q=="+ "\" />\r\n" +
                         "       <meta charset=\"UTF-8\">\n" +
-                        "       <title>Battleship - Hall of Fame</title>\n" +
+                        "       <title>Battleship - Win</title>\n" +
                         "   </head>\n" +
                         "   <body>\n" +
                         "       <h1>You Win</h1>\n");
