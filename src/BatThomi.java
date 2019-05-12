@@ -24,7 +24,7 @@ public class BatThomi {
         {
             for(int j =0;j<10;j++)
             {
-                if(grid[i][j] > 0)
+                if(grid[i][j] > 0 && grid[i][j] != 8)
                 {
                     return false;
                 }
