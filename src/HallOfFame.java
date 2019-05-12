@@ -3,19 +3,19 @@ import javafx.util.Pair;
 
 public class HallOfFame {
     private ArrayList<Pair<String, Integer>> bestScores;
-    private int size;
+
+    private static final int SIZE = 10;
 
     public HallOfFame() {
         this.bestScores = new ArrayList<>();
-        this.size = 10;
     }
 
-    public void addScore(String name, int score) {
-        for (int i=0; i < this.size; i++) {
+    public void addScore(String id, int score) {
+        for (int i=0; i < SIZE; i++) {
             if (score >  this.bestScores.get(i).getValue()) {
-                this.bestScores.add(i, new Pair<>(name, score));
-                if (this.bestScores.size() > this.size) {
-                    this.bestScores.remove(this.size);
+                this.bestScores.add(i, new Pair<>(id, score));
+                if (this.bestScores.size() > SIZE) {
+                    this.bestScores.remove(SIZE);
                 }
                 return;
             }
