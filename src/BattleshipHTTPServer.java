@@ -102,19 +102,23 @@ public class BattleshipHTTPServer {
     public static void main(String[] args) {
         /*
          * Main method accept up to 2 args
-         * args[0] => port to listen on
-         * args[1] => verbose mode for the server
+         * args[0] => number of threads
+         * args[1] => port to listen on
          */
         int portNumber = 2511;
         boolean verbose = true;
         int threadPoolSize = 25;
 
         if (args.length == 1) {
-            portNumber = Integer.parseInt(args[0]);
-        } else if (args.length == 2) {
-            portNumber = Integer.parseInt(args[0]);
-            verbose = Boolean.parseBoolean(args[1]);
-        } else if (args.length > 2) {
+            threadPoolSize = Integer.parseInt(args[0]);
+        }else if (args.length == 2) {
+            threadPoolSize = Integer.parseInt(args[0]);
+            portNumber = Integer.parseInt(args[1]);
+        } else if (args.length == 3) {
+            threadPoolSize = Integer.parseInt(args[0]);
+            portNumber = Integer.parseInt(args[1]);
+            verbose = Boolean.parseBoolean(args[2]);
+        } else if (args.length > 3) {
             System.out.println("Incorrect number of args");
             System.exit(1);
         }
