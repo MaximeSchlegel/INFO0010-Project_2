@@ -534,7 +534,7 @@ public class BattleshipHTTPHandler implements Runnable{
 
         responseBuilder.append(
 
-                " <form method=\"post\">\n" +
+                " <form target =\"/hall_of_fame.html\" method=\"post\">\n" +
                         "    <p>Enter your name: <input type=\"text\" name=\"nom\" style=\"border-radius: 5px;\" placeholder=\"name\"></p>\n" +
                         "    <input type=\"submit\" value=\"Submit\" style=\"background: blue; color: white; border-radius: 5px; height: 35px; width: 70px;\">" +
                         " </body>\n" +
