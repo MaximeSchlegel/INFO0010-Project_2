@@ -411,15 +411,15 @@ public class BattleshipHTTPHandler implements Runnable{
                     //check if he really won
                     if(this.Game.check_win()) {
                         this.master.bestGames.addScore(name,70 - this.Game.getNmbTries());
-                        putCookie = "Set-Cookie: SESSID=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00\n" + "GMT";
+                        putCookie = "Set-Cookie: Battleship=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 " + "GMT";
                     }
                     // send HTTP Headers
-                    headerOut.println("HTTP/1.1 200 OK");
-                    headerOut.println("Server: " + SERVER_DETAILS);
-                    headerOut.println("Date: " + new Date());
-                    headerOut.println("Content-type: " + "text/html");
-                    headerOut.println("Connection: close");
-                    headerOut.print(putCookie);
+                    this.headerOut.println("HTTP/1.1 200 OK");
+                    this.headerOut.println("Server: " + SERVER_DETAILS);
+                    this.headerOut.println("Date: " + new Date());
+                    this.headerOut.println("Content-type: " + "text/html");
+                    this.headerOut.println("Connection: close");
+                    this.headerOut.println(putCookie);
                     sendHallOfFame();
 
                 }
@@ -691,11 +691,6 @@ public class BattleshipHTTPHandler implements Runnable{
         String response = responseBuilder.toString();
 
 
-        // send HTTP Headers
-        this.headerOut.println("HTTP/1.1 200 OK");
-        this.headerOut.println("Server: " + SERVER_DETAILS);
-        this.headerOut.println("Date: " + new Date());
-        this.headerOut.println("Content-type: " + "text/html");
         this.headerOut.println("Content-length: " + response.getBytes().length);
         this.headerOut.println();
         this.headerOut.flush();
@@ -733,6 +728,7 @@ public class BattleshipHTTPHandler implements Runnable{
         this.headerOut.println("Server: " + SERVER_DETAILS);
         this.headerOut.println("Date: " + new Date());
         this.headerOut.println("Content-type: " + "text/html");
+        this.headerOut.println("Connection: close");
         this.headerOut.println("Content-length: " + response.getBytes().length);
         this.headerOut.println();
         this.headerOut.flush();
