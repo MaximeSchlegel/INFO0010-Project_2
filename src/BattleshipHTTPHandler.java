@@ -491,6 +491,10 @@ public class BattleshipHTTPHandler implements Runnable{
         play_html += "        document.getElementById(\"score\").innerHTML = \"You lost! <a href=\\\"hall_of_fame.html\\\">Go to the Hall of Fame.</a>\"\r\n;";
         play_html += "        document.getElementById(\"field\").style.display = \"none\";\r\n;";
         play_html += "        }\r\n";
+        play_html += "        else if(" + this.Game.check_win() + "){\r\n";
+        play_html += "        document.getElementById(\\\"score\\\").innerHTML = \\\"You lost! <a href=\\\\\\\"win.html\\\\\\\">Click here to enter your name</a>\\\"\\r\\n;\";\n";
+        play_html += "        document.getElementById(\\\"field\\\").style.display = \\\"none\\\";\\r\\n;\";";
+        play_html += "        }\r\n";
         play_html += "        else\r\n";
         play_html += "        {\r\n";
         play_html += "        context.drawImage(background,0,0,500,500);\r\n";
