@@ -31,6 +31,7 @@ public class CookieManager {
             for (int i = 0; i < 26; i++)
                 id += cookieCharacters.charAt(rand.nextInt(cookieCharacters.length()));
         }
+
         int [] boats = {2,3,3,4,5};
         System.out.println("Got this far");
         BatThomi newGame = new BatThomi(boats);

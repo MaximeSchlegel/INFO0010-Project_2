@@ -104,7 +104,7 @@ public class BattleshipHTTPServer {
          */
         int portNumber = 2511;
         boolean verbose = true;
-        int threadPoolSize = 25;
+        int threadPoolSize = 50;
 
         if (args.length == 1) {
             threadPoolSize = Integer.parseInt(args[0]);

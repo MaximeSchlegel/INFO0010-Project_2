@@ -1,7 +1,9 @@
 import java.io.*;
 import java.net.Socket;
+import java.rmi.server.ExportException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import javafx.util.Pair;
 
@@ -249,11 +251,44 @@ public class BattleshipHTTPHandler implements Runnable{
                 if (this.verbose) {
                     System.out.println("Got POST resquest");
                 }
+
+                String line = null;
+                if (httpQuerry.equals("/play.html")) {
+                    while(contentLengthLine == null) {
+                        line = inFromClient.readLine(); //get the second line to extract the host address
+                        StringTokenizer lineTokenizer = new StringTokenizer(line);
+                        String firstToken = lineTokenizer.nextToken();
+                        if (firstToken.equals("Content-Length:")) {
+                            contentLengthLine = line;
+                        }
+                    }
+
+                    if (contentLengthLine == null) {
+                        throw new Exception("Error");
+                    }
+
+                    while (!line.equals("")) {
+                        this.inFromClient.readLine();
+                    }
+
+                    StringTokenizer contentLengthTokenizer = new StringTokenizer(line);
+                    contentLengthTokenizer.nextToken();
+                    int contentLength = Integer.parseInt(contentLengthTokenizer.nextToken());
+                    char[] test = new char[contentLength];
+
+                    this.inFromClient.read(test);
+                    System.out.println(test);
+
+                }
             } else {
                 this.methodNotSupported(httpMethod);
             }
         } catch (Exception e){
             e.printStackTrace();
+        }
+
+        if (this.verbose) {
+            System.out.println("Worker died\n");
         }
     }
 
@@ -470,14 +505,14 @@ public class BattleshipHTTPHandler implements Runnable{
                         "   <head>\n" +
                         "<link rel=\"icon\" type=\"image/jpg\" href=\"" + "data:image/png;base64,/9j/4QAWRXhpZgAATU0AKgAAAAgAAAAAAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gOTAK/9sAQwABAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB/9sAQwEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB/8AAEQgAGQAZAwEiAAIRAQMRAf/EABgAAAMBAQAAAAAAAAAAAAAAAAgJCgAH/8QAMRAAAQQCAQIDAg8AAAAAAAAABAIDBQYBBwAIEhETIQkUChYaMUFCU1hik5ei0dLX/8QAGAEAAgMAAAAAAAAAAAAAAAAABwgEBQb/xAAmEQABBAIBAwQDAQAAAAAAAAADAQIEBQYHERITFAAhIiMIFRdB/9oADAMBAAIRAxEAPwB8UYMO6p1+RnK/XI4dKHTp63WSKqtci2nimARlSdgnTAosD3yRMDjQUvEJdOkTBARkOkvtt5HXr5tO8NG9L+wLXpo6Dr+2F/EtrXlgnIQbYFYfanbjCAGy0XGhPlRNvEfhFSYwhIJB0eM4/k9zClBYSnlvtDNURO3ej3asXJ5U07R3aluOCd8xxDaJ/U1pjbUI2S2lXYSMaAzLxjoxCHWM5PS92YeYZdbRXp/qq2hqOryWs0HZuWnZV9Z7usbOUWVBV+wpbcSDd9ekIewbry7Rbi8utyNfW3DzTSno61wk5HkKS1mrrM241kNdW2Riw6e1hK2Rbwo3mWVOpivjOsQwynGGw8VFbJ8NzguKguhpVcvQ4v6I/GOw3RgeQ55jroN1kGDZdEB/PLuWWjp85r4sOBbmonZVE7srHpVux5awM5YcgIXHQxTRGMWQymrRm3ojfuldZ7lgg5SJB2DVQ5lyImQCImWgplh8qFtEBIRxLrz4hMDaombiFIceeUpsJt7Lq8Od3Oq+Yr7Vf5qv7cG/o9ldH3XQ7Fo0hds2eaKfas+7Kme5gK01LZEvHAC2mck6m8tZ4AdkPARJH2YV+WgLdLvF2ZmZzKyUxHiEF3p/H+7+eEmDcwLASyK6wBZx0I8KTorSCDKUL1H5DBF+4DToiGYA/wBwmEa0qI9rk9K7k2NXWK3lhR32P2uMWUM7kNRXbGfs61hFaQUSWRjBhklAJ6CdMjNSLLViyYvMcg1WRTbvwgm4bO1LsfWYnSrUYQi+U6bqjM0Rt+wyLMU7Lje7pOdj26KE4agfxyrIyTBlOemMPI+fis4zrNkMt4xNa0DS9hPquGuLq28r8fXKUSNbZcSn6U9zrisemM5+twK+bhpvdGa2yYoC2lIVxIwVCJ4LS1AqDUncVF6JvDuXqq+/PH+cemL1jufY2m4dhX68yBKOBbzmT7GI+sqLUUmYwDIzJCuuIE8oXIATB9McgWORqK5qr7+mM0br7I11boO7VOrXKHnII8QtomIuw8IQWIyUwQbCkSUYOgzETMMMqj5MVSCGCBX3POEIzhLWWt/KTbH9y+k/rVP/AObcmL5uSMZ0tr/GGTBVdTI6JZAvKkm0tJHyE1yN6OZjUZ8XqjuEVXcN5X4pxWbX2Vle65lPYbDlxbaXRR5USuPEroNM8ceYUBjDMtOCEslvcjscJJKlQCuKoe2pzK//2Q=="+ "\" />\r\n" +
                         "       <meta charset=\"UTF-8\">\n" +
-                        "       <title>Battleship - Win</title>\n" +
+                        "       <title>Battleship - You Win</title>\n" +
                         "   </head>\n" +
                         "   <body>\n" +
                         "       <h1>You Win</h1>\n");
 
         responseBuilder.append(
 
-                " <form method=\"post\">\n" +
+                " <form target =\"/hall_of_fame.html\" method=\"post\">\n" +
                         "    <p>Enter your name: <input type=\"text\" name=\"nom\" style=\"border-radius: 5px;\" placeholder=\"name\"></p>\n" +
                         "    <input type=\"submit\" value=\"Submit\" style=\"background: blue; color: white; border-radius: 5px; height: 35px; width: 70px;\">" +
                         " </body>\n" +
