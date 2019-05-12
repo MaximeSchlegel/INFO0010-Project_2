@@ -6,6 +6,7 @@ import java.net.*;
 public class BatThomi {
 
     int[][] grid;
+    private int nmb_tries = 0;
 
 
     public BatThomi(int[] boats)
@@ -58,6 +59,7 @@ public class BatThomi {
         if(grid[posx][posy] == 8)
             grid[posx][posy] = 0;
         grid[posx][posy] = -grid[posx][posy];
+        nmb_tries++;
 
         return -grid[posx][posy];
     }
@@ -67,6 +69,10 @@ public class BatThomi {
         this.grid = new int [10][10];
             for(int i = 0; i < 10; i++)
                 Arrays.fill(grid[i],8);
+    }
+
+    public int getNmbTries(){
+        return nmb_tries;
     }
 
     public void place_boat(int badassery)
