@@ -1,7 +1,9 @@
 import java.io.*;
 import java.net.Socket;
+import java.rmi.server.ExportException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import javafx.util.Pair;
 
@@ -108,11 +110,16 @@ public class BattleshipHTTPHandler implements Runnable{
             StringTokenizer CookieTokenizer = new StringTokenizer(Cookieline);
             String iscookie = CookieTokenizer.nextToken();
 
+            //save the cotent length line in case post
+            String contentLengthLine = null;
+
             while(!iscookie.equals("Cookie:")) {
                 System.out.println("Cookie lline :" + iscookie);
                 Cookieline = inFromClient.readLine(); //get the second line to extract the host address
                 CookieTokenizer = new StringTokenizer(Cookieline);
-
+                if (iscookie.equals("Content-Length:")) {
+                    contentLengthLine = Cookieline;
+                }
                 try {
                     iscookie = CookieTokenizer.nextToken();
                     this.cookie = CookieTokenizer.nextToken();
@@ -147,7 +154,7 @@ public class BattleshipHTTPHandler implements Runnable{
                     headerOut.println("HTTP/1.1 303 See Other");
                     headerOut.println("Server: " + SERVER_DETAILS);
                     headerOut.println("Date: " + new Date());
-                    headerOut.println("Location: " + "http://" +httpHost + "/play.html");
+                    headerOut.println("Location: " + "http://" + httpHost + "/play.html");
                     headerOut.println("Connection: close");
                     headerOut.println("Content-length: 0");
                     headerOut.println();
@@ -249,11 +256,44 @@ public class BattleshipHTTPHandler implements Runnable{
                 if (this.verbose) {
                     System.out.println("Got POST resquest");
                 }
+
+                String line = null;
+                if (httpQuerry.equals("/play.html")) {
+                    while(contentLengthLine == null) {
+                        line = inFromClient.readLine(); //get the second line to extract the host address
+                        StringTokenizer lineTokenizer = new StringTokenizer(line);
+                        String firstToken = lineTokenizer.nextToken();
+                        if (firstToken.equals("Content-Length:")) {
+                            contentLengthLine = line;
+                        }
+                    }
+
+                    if (contentLengthLine == null) {
+                        throw new Exception("Error");
+                    }
+
+                    while (!line.equals("")) {
+                        this.inFromClient.readLine();
+                    }
+
+                    StringTokenizer contentLengthTokenizer = new StringTokenizer(line);
+                    contentLengthTokenizer.nextToken();
+                    int contentLength = Integer.parseInt(contentLengthTokenizer.nextToken());
+                    char[] test = new char[contentLength];
+
+                    this.inFromClient.read(test);
+                    System.out.println(test);
+
+                }
             } else {
                 this.methodNotSupported(httpMethod);
             }
         } catch (Exception e){
             e.printStackTrace();
+        }
+
+        if (this.verbose) {
+            System.out.println("Worker died\n");
         }
     }
 
@@ -395,11 +435,32 @@ public class BattleshipHTTPHandler implements Runnable{
         play_html += "        window.onload = charger;\r\n";
         play_html += "        document.getElementById(\"field\").onclick=shoot;\r\n";
         play_html += "        </script>\r\n";
+        play_html += "        </script>\r\n";
+        play_html += "        </script>\r\n";
+        play_html += "        </script>\r\n";
+        play_html += "        </script>\r\n";
+
+        play_html += "<div>\n";
+        play_html += "<form action='/play.html' method='post'>\n";
+        play_html += "<input type='submit'" +
+                        "value = '" + "1" + "'" +
+                        "name = 'id'" +
+                        "style = '" +
+                        " cursor:pointer;" +
+                        " width: 50px;" +
+                        " height: 50px;'>";
+        play_html += ("</form>\n");
+        play_html += ("</div>\n");
+
         play_html += "\r\n";
         play_html += "        </body>\r\n";
         play_html += "        </html>\r\n";
 
-
+        this.headerOut.println("HTTP/1.1 200 OK");
+        this.headerOut.println("Server: " + SERVER_DETAILS);
+        this.headerOut.println("Date: " + new Date());
+        this.headerOut.println("Content-type: " + "text/html");
+        headerOut.println("Set-Cookie: " + "Battleship=" + this.cookie);
         this.headerOut.println("Content-length: " + play_html.getBytes().length);
         this.headerOut.println();
         this.headerOut.flush();
