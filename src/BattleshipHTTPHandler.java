@@ -411,8 +411,23 @@ public class BattleshipHTTPHandler implements Runnable{
 
         //css for no script
         play_html += "    <style>";
-
+        play_html += ".wata{\n";
+        play_html += "background: url(data:image/png;base64," + this.master.wauta50  +  ");\n";
+        play_html += "width: 50px;\n";
+        play_html += "height: 50px;\n";
+        play_html += "}";
+        play_html += ".claudy{\n";
+        play_html += "background: url(data:image/png;base64," + this.master.wautaclaudy  +  ");\n";
+        play_html += "width: 50px;\n";
+        play_html += "height: 50px;\n";
+        play_html += "}";
+        play_html += ".expl{\n";
+        play_html += "background: url(data:image/png;base64," + this.master.explosion  + ");\n";
+        play_html += "width: 50px;\n";
+        play_html += "height: 50px;\n";
+        play_html += "}";
         play_html += "    </style>";
+
 
         play_html += "</head>\r\n";
         play_html += "<body>\r\n";
@@ -487,22 +502,7 @@ public class BattleshipHTTPHandler implements Runnable{
         play_html += "        window.onload = charger;\r\n";
         play_html += "        document.getElementById(\"field\").onclick=shoot;\r\n";
         play_html += "        </script>\r\n";
-        play_html += "        </script>\r\n";
-        play_html += "        </script>\r\n";
-        play_html += "        </script>\r\n";
-        play_html += "        </script>\r\n";
 
-        play_html += "<div>\n";
-        play_html += "<form action='/play.html' method='post'>\n";
-        play_html += "<input type='submit'" +
-                        "value = '" + "1" + "'" +
-                        "name = 'id'" +
-                        "style = '" +
-                        " cursor:pointer;" +
-                        " width: 50px;" +
-                        " height: 50px;'>";
-        play_html += ("</form>\n");
-        play_html += ("</div>\n");
 
         play_html += "\r\n";
 
@@ -513,17 +513,17 @@ public class BattleshipHTTPHandler implements Runnable{
         for(int id = 0;id<100;id++)
         {
             if(id%10 == 0)
-                play_html += "\r\n";
-            play_html += "<submit name=\"id\"  value=\"" + id + "\" method=\"post\">" + "<img src=\"" ;
+                play_html += "<br>";
+            play_html += "<input type=\"submit\" name=\"id\"  value=\"" + id + "\" method=\"post\"" ;
 
             if(gamestate[id] ==8)
-                play_html +="data:image/png;base64," + this.master.wautaclaudy  + "\" ";
+                play_html +=" class=\"claudy\" ";
             else if(gamestate[id] ==0)
-                play_html +="data:image/png;base64," + this.master.wauta50  + "\"";
+                play_html +=" class=\"wata\" ";
             else
-                play_html +="data:image/png;base64," + this.master.explosion  + "\"";
+                play_html +=" class=\"expl\" ";
 
-            play_html += "></submit> ";
+            play_html += "></input> ";
 
         }
         play_html+= " </form >\r\n" ;
@@ -533,15 +533,10 @@ public class BattleshipHTTPHandler implements Runnable{
         play_html += "        </body>\r\n";
         play_html += "        </html>\r\n";
 
-        this.headerOut.println("HTTP/1.1 200 OK");
-        this.headerOut.println("Server: " + SERVER_DETAILS);
-        this.headerOut.println("Date: " + new Date());
-        this.headerOut.println("Content-type: " + "text/html");
-        headerOut.println("Set-Cookie: " + "Battleship=" + this.cookie);
         this.headerOut.println("Content-length: " + play_html.getBytes().length);
         this.headerOut.println();
         this.headerOut.flush();
-
+        System.out.println("got up to here");
         headerOut.print(play_html);
         headerOut.flush();
 
