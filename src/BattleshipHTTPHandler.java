@@ -293,9 +293,12 @@ public class BattleshipHTTPHandler implements Runnable{
 
             } else if (httpMethod.equals("POST")) {
                 if (this.verbose) {
-                    System.out.println("Got POST resquest");
+                    System.out.println("Got POST request");
                 }
                 if (httpQuerry.equals("/play.html")) {
+                    if (this.verbose) {
+                        System.out.println("Got Post resquest for /play.html");
+                    }
                     String line;
                     while(contentLengthLine == null) {
                         line = inFromClient.readLine(); //get the second line to extract the host address
@@ -368,6 +371,57 @@ public class BattleshipHTTPHandler implements Runnable{
 
                         }
                     }
+                }
+                else if(httpQuerry.equals("/hall_of_fame.html")){
+                    if (this.verbose) {
+                        System.out.println("Got Post request for /hall_of_fame.html");
+                    }
+
+                    String line;
+                    while(contentLengthLine == null) {
+                        line = inFromClient.readLine(); //get the second line to extract the host address
+                        StringTokenizer lineTokenizer = new StringTokenizer(line);
+                        String firstToken = lineTokenizer.nextToken();
+                        if (firstToken.equals("Content-Length:")) {
+                            contentLengthLine = line;
+                        }
+                    }
+
+                    if (contentLengthLine == null) {
+                        throw new Exception("Error");
+                    }
+
+                    line = this.inFromClient.readLine();
+                    while (!line.equals("")) {
+                        line = this.inFromClient.readLine();
+                    }
+
+                    System.out.println(contentLengthLine);
+
+                    StringTokenizer contentLengthTokenizer = new StringTokenizer(contentLengthLine);
+                    contentLengthTokenizer.nextToken();
+                    int contentLength = Integer.parseInt(contentLengthTokenizer.nextToken());
+                    char[] resquest = new char[contentLength];
+                    this.inFromClient.read(resquest);
+                    System.out.println(resquest);
+                    String tmp = new String(resquest);
+                    System.out.println(tmp);
+                    String name = (tmp.split("=")[1]);
+
+                    //check if he really won
+                    if(this.Game.check_win()) {
+                        this.master.bestGames.addScore(name,70 - this.Game.getNmbTries());
+                        putCookie = "Set-Cookie: SESSID=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00\n" + "GMT";
+                    }
+                    // send HTTP Headers
+                    headerOut.println("HTTP/1.1 200 OK");
+                    headerOut.println("Server: " + SERVER_DETAILS);
+                    headerOut.println("Date: " + new Date());
+                    headerOut.println("Content-type: " + "text/html");
+                    headerOut.println("Connection: close");
+                    headerOut.print(putCookie);
+                    sendHallOfFame();
+
                 }
             } else {
                 this.methodNotSupported(httpMethod);
@@ -665,7 +719,7 @@ public class BattleshipHTTPHandler implements Runnable{
 
         responseBuilder.append(
 
-                " <form method=\"post\">\n" +
+                " <form method=\"post\" action=\"hall_of_fame.html\" >\n" +
                         "    <p>Enter your name: <input type=\"text\" name=\"nom\" style=\"border-radius: 5px;\" placeholder=\"name\"></p>\n" +
                         "    <input type=\"submit\" value=\"Submit\" style=\"background: blue; color: white; border-radius: 5px; height: 35px; width: 70px;\">" +
                         " </body>\n" +
