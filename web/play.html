@@ -3,9 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <title>Battleship - Play</title>
+    <style>
+    wata{
+    background: url(Wauta.png);
+    width: 50px;
+    height: 50px;
+    }
+
+
+
+    </style>
 </head>
 <body>
     <h1>Play</h1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <script type="text/javascript">
 
     var gamestate = Array(100).fill(0);
@@ -90,7 +121,11 @@
 <canvas id="field"  onclick="shoot" style="display: none;position: relative;left: 10px;top: 0px;z-index: 1;" width="500" height="500" ></canvas>
     <p id="score">70</p>
 </div>
+<noscript>
 
+
+
+</noscript>
 <script type="text/javascript">
     window.onload = charger;
     document.getElementById("field").onclick=shoot;

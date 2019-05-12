@@ -29,10 +29,12 @@ public class BattleshipHTTPServer {
     public String explosion;
     public String wauta;
     public String claudy;
+    public String wauta50;
+    public String wautaclaudy;
     private static final File WEB_ROOT = new File("./web/");
 
     public BattleshipHTTPServer(int threadPoolSize, int portNumber, boolean verbose,
-                                String expl_dir, String wauta_dir, String claudy_dir) {
+                                String expl_dir, String wauta_dir, String claudy_dir, String wauta50_dir, String wautaclaudy_dir) {
         try {
             //save the pictures in base 64
             File fexpl = new File(WEB_ROOT, expl_dir);
@@ -52,6 +54,19 @@ public class BattleshipHTTPServer {
             byte[] bytes_water = new byte[(int) fwater.length()];
             fin_water.read(bytes_water);
             this.wauta = Base64.getEncoder().encodeToString(bytes_water);
+
+            File fwater50 = new File(WEB_ROOT, wauta50_dir);
+            FileInputStream fin_water50 = new FileInputStream(fwater50);
+            byte[] bytes_water50 = new byte[(int) fwater50.length()];
+            fin_water50.read(bytes_water50);
+            this.wauta50 = Base64.getEncoder().encodeToString(bytes_water50);
+
+            File fwaterclaudy = new File(WEB_ROOT, wautaclaudy_dir);
+            FileInputStream fin_waterclaudy = new FileInputStream(fwaterclaudy);
+            byte[] bytes_waterclaudy = new byte[(int) fwaterclaudy.length()];
+            fin_waterclaudy.read(bytes_waterclaudy);
+            this.wautaclaudy = Base64.getEncoder().encodeToString(bytes_waterclaudy);
+
         }
         catch(Exception e){
             System.out.println(e + "Il y a eu un problème dans la lecture des fichiers images.");
@@ -121,7 +136,7 @@ public class BattleshipHTTPServer {
         }
 
         BattleshipHTTPServer server = new BattleshipHTTPServer(threadPoolSize, portNumber, verbose,
-                "Explosion.jpg","Wauta.jpg","Claudy.png");
+                "explosion50.jpg","Wauta.jpg","Claudy.png","wauta50.jpg","Clauda50.png");
 
         try {
             server.launch();

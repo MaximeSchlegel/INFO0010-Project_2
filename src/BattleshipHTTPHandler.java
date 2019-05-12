@@ -351,6 +351,8 @@ public class BattleshipHTTPHandler implements Runnable{
     }
 
     private void sendPlay() throws IOException {
+
+        int[] gamestate =this.Game.peekabou();
         String play_html = "";
         play_html += "<!DOCTYPE html>\r\n";
         play_html += "<html lang=\"en\">\r\n";
@@ -358,11 +360,17 @@ public class BattleshipHTTPHandler implements Runnable{
         play_html += "<meta charset=\"UTF-8\">\r\n";
         play_html += "<title>Battleship - Play</title>\r\n";
         play_html += "<link rel=\"icon\" type=\"image/jpg\" href=\"" + "data:image/png;base64,/9j/4QAWRXhpZgAATU0AKgAAAAgAAAAAAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gOTAK/9sAQwABAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB/9sAQwEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB/8AAEQgAGQAZAwEiAAIRAQMRAf/EABgAAAMBAQAAAAAAAAAAAAAAAAgJCgAH/8QAMRAAAQQCAQIDAg8AAAAAAAAABAIDBQYBBwAIEhETIQkUChYaMUFCU1hik5ei0dLX/8QAGAEAAgMAAAAAAAAAAAAAAAAABwgEBQb/xAAmEQABBAIBAwQDAQAAAAAAAAADAQIEBQYHERITFAAhIiMIFRdB/9oADAMBAAIRAxEAPwB8UYMO6p1+RnK/XI4dKHTp63WSKqtci2nimARlSdgnTAosD3yRMDjQUvEJdOkTBARkOkvtt5HXr5tO8NG9L+wLXpo6Dr+2F/EtrXlgnIQbYFYfanbjCAGy0XGhPlRNvEfhFSYwhIJB0eM4/k9zClBYSnlvtDNURO3ej3asXJ5U07R3aluOCd8xxDaJ/U1pjbUI2S2lXYSMaAzLxjoxCHWM5PS92YeYZdbRXp/qq2hqOryWs0HZuWnZV9Z7usbOUWVBV+wpbcSDd9ekIewbry7Rbi8utyNfW3DzTSno61wk5HkKS1mrrM241kNdW2Riw6e1hK2Rbwo3mWVOpivjOsQwynGGw8VFbJ8NzguKguhpVcvQ4v6I/GOw3RgeQ55jroN1kGDZdEB/PLuWWjp85r4sOBbmonZVE7srHpVux5awM5YcgIXHQxTRGMWQymrRm3ojfuldZ7lgg5SJB2DVQ5lyImQCImWgplh8qFtEBIRxLrz4hMDaombiFIceeUpsJt7Lq8Od3Oq+Yr7Vf5qv7cG/o9ldH3XQ7Fo0hds2eaKfas+7Kme5gK01LZEvHAC2mck6m8tZ4AdkPARJH2YV+WgLdLvF2ZmZzKyUxHiEF3p/H+7+eEmDcwLASyK6wBZx0I8KTorSCDKUL1H5DBF+4DToiGYA/wBwmEa0qI9rk9K7k2NXWK3lhR32P2uMWUM7kNRXbGfs61hFaQUSWRjBhklAJ6CdMjNSLLViyYvMcg1WRTbvwgm4bO1LsfWYnSrUYQi+U6bqjM0Rt+wyLMU7Lje7pOdj26KE4agfxyrIyTBlOemMPI+fis4zrNkMt4xNa0DS9hPquGuLq28r8fXKUSNbZcSn6U9zrisemM5+twK+bhpvdGa2yYoC2lIVxIwVCJ4LS1AqDUncVF6JvDuXqq+/PH+cemL1jufY2m4dhX68yBKOBbzmT7GI+sqLUUmYwDIzJCuuIE8oXIATB9McgWORqK5qr7+mM0br7I11boO7VOrXKHnII8QtomIuw8IQWIyUwQbCkSUYOgzETMMMqj5MVSCGCBX3POEIzhLWWt/KTbH9y+k/rVP/AObcmL5uSMZ0tr/GGTBVdTI6JZAvKkm0tJHyE1yN6OZjUZ8XqjuEVXcN5X4pxWbX2Vle65lPYbDlxbaXRR5USuPEroNM8ceYUBjDMtOCEslvcjscJJKlQCuKoe2pzK//2Q=="+ "\" />\r\n";
+
+        //css for no script
+        play_html += "    <style>";
+
+        play_html += "    </style>";
+
         play_html += "</head>\r\n";
         play_html += "<body>\r\n";
         play_html += "<h1>Play</h1>\r\n";
         play_html += "<script type=\"text/javascript\">\r\n";
-        play_html += "var gamestate = " + java.util.Arrays.toString(this.Game.peekabou()) + ";\r\n";
+        play_html += "var gamestate = " + java.util.Arrays.toString(gamestate) + ";\r\n";
         play_html += "        var background = new Image();\r\n";
         play_html +=  "       background.src= \"data:image/png;base64," + this.master.wauta  + "\";\r\n";
         play_html += "        nuage = new Image();\r\n";
@@ -436,6 +444,31 @@ public class BattleshipHTTPHandler implements Runnable{
         play_html += "        document.getElementById(\"field\").onclick=shoot;\r\n";
         play_html += "        </script>\r\n";
         play_html += "\r\n";
+
+        //partie no script
+        play_html += "<noscript>\r\n";
+        play_html += "<form target =\"\" method=\"post\">\r\n";
+
+        for(int id = 0;id<100;id++)
+        {
+            if(id%10 == 0)
+                play_html += "\r\n";
+            play_html += "<submit name=\"id\"  value=\"" + id + "\" method=\"post\">" + "<img src=\"" ;
+
+            if(gamestate[id] ==8)
+                play_html +="data:image/png;base64," + this.master.wautaclaudy  + "\" ";
+            else if(gamestate[id] ==0)
+                play_html +="data:image/png;base64," + this.master.wauta50  + "\"";
+            else
+                play_html +="data:image/png;base64," + this.master.explosion  + "\"";
+
+            play_html += "></submit> ";
+
+        }
+        play_html+= " </form >\r\n" ;
+
+        play_html += "</noscript>\r\n";
+
         play_html += "        </body>\r\n";
         play_html += "        </html>\r\n";
 
