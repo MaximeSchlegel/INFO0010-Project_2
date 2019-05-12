@@ -173,26 +173,7 @@ public class BattleshipHTTPHandler implements Runnable{
                         this.Game = p.getValue();
                         putCookie = "Set-Cookie: " + "Battleship=" + this.cookie + "\r\n";
                     }
-                    if(this.Game.getNmbTries() >=70){
-                        headerOut.println("HTTP/1.1 303 See Other");
-                        headerOut.println("Server: " + SERVER_DETAILS);
-                        headerOut.println("Date: " + new Date());
-                        headerOut.println("Location: " + "http://" +httpHost + "/hall_of_fame.html");
-                        headerOut.println("Connection: close");
-                        headerOut.println("Content-length: 0");
-                        headerOut.println();
-                        headerOut.flush();
-                    }
-                    if(this.Game.check_win()){
-                        headerOut.println("HTTP/1.1 303 See Other");
-                        headerOut.println("Server: " + SERVER_DETAILS);
-                        headerOut.println("Date: " + new Date());
-                        headerOut.println("Location: " + "http://" +httpHost + "/win.html");
-                        headerOut.println("Connection: close");
-                        headerOut.println("Content-length: 0");
-                        headerOut.println();
-                        headerOut.flush();
-                    }
+                   
                     //with the id ?
                     if(!id_from_get.equals("")) {
                         //got get from javascript ajax need only to send one number
@@ -287,6 +268,26 @@ public class BattleshipHTTPHandler implements Runnable{
                 }
             } else {
                 this.methodNotSupported(httpMethod);
+            }
+            if(this.Game.getNmbTries() >=70){
+                headerOut.println("HTTP/1.1 303 See Other");
+                headerOut.println("Server: " + SERVER_DETAILS);
+                headerOut.println("Date: " + new Date());
+                headerOut.println("Location: " + "http://" +httpHost + "/hall_of_fame.html");
+                headerOut.println("Connection: close");
+                headerOut.println("Content-length: 0");
+                headerOut.println();
+                headerOut.flush();
+            }
+            if(this.Game.check_win()){
+                headerOut.println("HTTP/1.1 303 See Other");
+                headerOut.println("Server: " + SERVER_DETAILS);
+                headerOut.println("Date: " + new Date());
+                headerOut.println("Location: " + "http://" +httpHost + "/win.html");
+                headerOut.println("Connection: close");
+                headerOut.println("Content-length: 0");
+                headerOut.println();
+                headerOut.flush();
             }
         } catch (Exception e){
             e.printStackTrace();
