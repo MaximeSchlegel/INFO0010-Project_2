@@ -417,7 +417,7 @@ public class BattleshipHTTPHandler implements Runnable{
 
                     //check if he really won
                     if(this.Game.check_win()) {
-                        this.master.bestGames.addScore(name,70 - this.Game.getNmbTries());
+                        this.master.bestGames.addScore(this.cookie,name,70 - this.Game.getNmbTries());
                         putCookie = "Set-Cookie: Battleship=deleted; path=/; expires=Thu, 01 Jan 1970 00:00:00 " + "GMT";
                     }
                     // send HTTP Headers
@@ -675,16 +675,16 @@ public class BattleshipHTTPHandler implements Runnable{
             "   <body>\n" +
             "       <h1>Hall of Fame</h1>\n");
 
-        ArrayList<Pair<String, Integer>> halloffame = this.master.bestGames.getScore();
+        ArrayList<Pair<String, Pair<String, Integer>>> halloffame = this.master.bestGames.getScore();
         if (halloffame.size() == 0) {
             responseBuilder.append("Nobody beat the game. Try it !");
         } else {
             responseBuilder.append(
                     "       <table>\n" +
-                    "           <tr><th>Username</th><th>Score</th></tr>\n");
-            for(Pair<String, Integer> score: halloffame) {
+                    "           <tr><th>Cookie</th><th>Username</th><th>Score</th></tr>\n");
+            for(Pair<String,Pair<String,Integer>> score: halloffame) {
                 responseBuilder.append(
-                    "           <tr><th>" + score.getKey() + "</th><th>" + score.getValue() + "</th></tr>");
+                    "           <tr><th>" + score.getKey() + "</th><th>" + score.getValue().getKey() + "</th><th>" + score.getValue().getValue()+"</th></tr>");
             }
             responseBuilder.append(
                     "       </table>\n");
