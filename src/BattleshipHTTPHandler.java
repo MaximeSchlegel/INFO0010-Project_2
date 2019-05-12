@@ -175,6 +175,16 @@ public class BattleshipHTTPHandler implements Runnable{
                         headerOut.println();
                         headerOut.flush();
                     }
+                    if(this.Game.check_win()){
+                        headerOut.println("HTTP/1.1 303 See Other");
+                        headerOut.println("Server: " + SERVER_DETAILS);
+                        headerOut.println("Date: " + new Date());
+                        headerOut.println("Location: " + "http://" +httpHost + "/win.html");
+                        headerOut.println("Connection: close");
+                        headerOut.println("Content-length: 0");
+                        headerOut.println();
+                        headerOut.flush();
+                    }
                     //with the id ?
                     if(!id_from_get.equals("")) {
                         //got get from javascript ajax need only to send one number
