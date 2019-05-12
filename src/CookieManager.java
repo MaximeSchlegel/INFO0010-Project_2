@@ -24,12 +24,15 @@ public class CookieManager {
     public Pair<String,BatThomi> getNewGame() {
         Random rand = new Random();
         String id = "";
+        for (int i = 0; i < 26; i++)
+            id += cookieCharacters.charAt(rand.nextInt(cookieCharacters.length()));
         while(this.isUsed(id)) {
             id = "";
             for (int i = 0; i < 26; i++)
                 id += cookieCharacters.charAt(rand.nextInt(cookieCharacters.length()));
         }
         int [] boats = {2,3,3,4,5};
+        System.out.println("Got this far");
         BatThomi newGame = new BatThomi(boats);
         this.saved_game.put(id, newGame);
         return new Pair<>(id,newGame);

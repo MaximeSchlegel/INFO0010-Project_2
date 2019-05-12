@@ -40,7 +40,7 @@ public class BatThomi {
         for(int i =0;i<100;i++)
         {
             //touché
-            if(grid[i%10][(i/10)%10] >0)
+            if(grid[i%10][(i/10)%10] <0)
                 view[i] = 1;
                 //plouf
             else if(grid[i%10][(i/10)%10] ==0)
@@ -64,11 +64,8 @@ public class BatThomi {
 
     public void populate() {
         grid = new int [10][10];
-
-
             for(int i = 0; i < 10; i++)
                 Arrays.fill(grid[i],8);
-
     }
 
     public void place_boat(int badassery)
@@ -92,8 +89,7 @@ public class BatThomi {
             //check if there isn't a boat in the position already
             for( int i = 0; i <badassery ;i++)
             {
-
-                if(grid[posx + i *Math.abs(dir)][posy + i *Math.abs(dir-1)] != 0)
+                if(grid[posx + i *Math.abs(dir)][posy + i *Math.abs(dir-1)] != 8)
                 {
                     not_good = true;
                 }
