@@ -374,8 +374,9 @@ public class BattleshipHTTPHandler implements Runnable{
         this.headerOut.println();
         this.headerOut.flush();
 
-        this.dataOut.write(play_html.getBytes(), 0, play_html.getBytes().length);
-        this.dataOut.flush();
+        headerOut.print(play_html);
+        headerOut.flush();
+
     }
 
     private void sendHallOfFame() throws IOException {
