@@ -19,7 +19,7 @@ public class BatThomi {
 
     }
 
-    private boolean check_win() {
+    public boolean check_win() {
         for(int i =0;i < 10;i++)
         {
             for(int j =0;j<10;j++)
