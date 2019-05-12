@@ -11,7 +11,7 @@ public class HallOfFame {
     }
 
     public void addScore(String id, int score) {
-        for (int i=0; i < SIZE; i++) {
+        for (int i=0; i < this.bestScores.size(); i++) {
             if (score >  this.bestScores.get(i).getValue()) {
                 this.bestScores.add(i, new Pair<>(id, score));
                 if (this.bestScores.size() > SIZE) {
