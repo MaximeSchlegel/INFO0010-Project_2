@@ -11,8 +11,9 @@ public class HallOfFame {
     }
 
     public void addScore(String id, int score) {
-        for (int i=0; i < this.bestScores.size(); i++) {
-            if (score >  this.bestScores.get(i).getValue()) {
+        int i = 0;
+        for (i=0; i < this.bestScores.size(); i++) {
+            if (score > this.bestScores.get(i).getValue()) {
                 this.bestScores.add(i, new Pair<>(id, score));
                 if (this.bestScores.size() > SIZE) {
                     this.bestScores.remove(SIZE);
@@ -20,6 +21,9 @@ public class HallOfFame {
                 return;
             }
         }
+        //le mettre dedans a la fin
+        if(i < SIZE)
+            this.bestScores.add( new Pair<>(id, score));
     }
 
     public ArrayList<Pair<String, Integer>> getScore() {
