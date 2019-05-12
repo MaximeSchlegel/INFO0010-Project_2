@@ -143,8 +143,16 @@ public class BattleshipHTTPHandler implements Runnable{
                     this.cookie = "";
                 }
             }
+            String putCookie = "";
             System.out.println("Cookie: " + this.cookie);
-
+            if (this.master.cookieManager.isUsed(this.cookie)) {
+                this.Game = this.master.cookieManager.getGame(this.cookie);
+            } else {
+                Pair<String, BatThomi> p = this.master.cookieManager.getNewGame();
+                this.cookie = p.getKey();
+                this.Game = p.getValue();
+                putCookie = "Set-Cookie: " + "Battleship=" + this.cookie + "\r\n";
+            }
 
             if (httpMethod.equals("GET")) {
                 if (httpQuerry.equals("/")) {
@@ -166,15 +174,7 @@ public class BattleshipHTTPHandler implements Runnable{
                     if (this.verbose) {
                         System.out.println("Got GET resquest for /play.html");
                     }
-                    String putCookie ="";
-                    if (this.master.cookieManager.isUsed(this.cookie)) {
-                        this.Game = this.master.cookieManager.getGame(this.cookie);
-                    } else {
-                        Pair<String, BatThomi> p = this.master.cookieManager.getNewGame();
-                        this.cookie = p.getKey();
-                        this.Game = p.getValue();
-                        putCookie = "Set-Cookie: " + "Battleship=" + this.cookie + "\r\n";
-                    }
+
                     if(this.Game.getNmbTries() >=70){
                         headerOut.println("HTTP/1.1 303 See Other");
                         headerOut.println("Server: " + SERVER_DETAILS);
@@ -185,23 +185,10 @@ public class BattleshipHTTPHandler implements Runnable{
                         headerOut.println();
                         headerOut.flush();
                     }
-                    if(this.Game.check_win()){
-                        headerOut.println("HTTP/1.1 303 See Other");
-                        headerOut.println("Server: " + SERVER_DETAILS);
-                        headerOut.println("Date: " + new Date());
-                        headerOut.println("Location: " + "http://" +httpHost + "/win.html");
-                        headerOut.println("Connection: close");
-                        headerOut.println("Content-length: 0");
-                        headerOut.println();
-                        headerOut.flush();
-                    }
                     //with the id ?
                     if(!id_from_get.equals("")) {
                         //got get from javascript ajax need only to send one number
                         try {
-                            int id = Integer.parseInt(id_from_get);
-                            //first update gamestate
-                            int value = this.Game.boom(id);
 
                             if(this.Game.getNmbTries() >=70){
                                 headerOut.println("HTTP/1.1 303 See Other");
@@ -212,30 +199,42 @@ public class BattleshipHTTPHandler implements Runnable{
                                 headerOut.println("Content-length: 0");
                                 headerOut.println();
                                 headerOut.flush();
-                            } else if(this.Game.check_win()) {
-                                headerOut.println("HTTP/1.1 303 See Other");
-                                headerOut.println("Server: " + SERVER_DETAILS);
-                                headerOut.println("Date: " + new Date());
-                                headerOut.println("Location: " + "http://" + httpHost + "/win.html");
-                                headerOut.println("Connection: close");
-                                headerOut.println("Content-length: 0");
-                                headerOut.println();
-                                headerOut.flush();
                             }
                             else {
-
-                                // send HTTP Headers
-                                headerOut.println("HTTP/1.1 200 OK");
-                                headerOut.println("Server: " + httpHost);
-                                headerOut.println("Date: " + new Date());
-                                headerOut.println("Content-type: " + "text/html");
-                                headerOut.println("Connection: close");
-                                headerOut.println("Content-length: 1");
-                                headerOut.println(); // blank line between headers and content, very important !
-                                headerOut.flush(); // flush character output stream buffer
+                                int id = Integer.parseInt(id_from_get);
+                                //first update gamestate
+                                int value = this.Game.boom(id);
+                                for(int i =0;i<this.Game.peekabou().length;i++)
+                                    System.out.print(this.Game.peekabou()[i]+" ");
+                                if(this.Game.check_win()) {
+                                    System.out.println("IL A WINN");
+                                    // send HTTP Headers
+                                    headerOut.println("HTTP/1.1 200 OK");
+                                    headerOut.println("Server: " + httpHost);
+                                    headerOut.println("Date: " + new Date());
+                                    headerOut.println("Content-type: " + "text/html");
+                                    headerOut.println("Connection: close");
+                                    headerOut.println("Content-length: 2");
+                                    headerOut.println(); // blank line between headers and content, very important !
+                                    headerOut.flush(); // flush character output stream buffer
 //
-                                headerOut.print(value);
-                                headerOut.flush();
+                                    headerOut.print("-1");
+                                    headerOut.flush();
+                                }
+                                else {
+                                    // send HTTP Headers
+                                    headerOut.println("HTTP/1.1 200 OK");
+                                    headerOut.println("Server: " + httpHost);
+                                    headerOut.println("Date: " + new Date());
+                                    headerOut.println("Content-type: " + "text/html");
+                                    headerOut.println("Connection: close");
+                                    headerOut.println("Content-length: 1");
+                                    headerOut.println(); // blank line between headers and content, very important !
+                                    headerOut.flush(); // flush character output stream buffer
+//
+                                    headerOut.print(value);
+                                    headerOut.flush();
+                                }
                             }
                         } catch (Exception e) {
                             System.out.println("Wrong variable through GET: " + e);
@@ -266,11 +265,27 @@ public class BattleshipHTTPHandler implements Runnable{
 
                 } else if (httpQuerry.equals("/win.html")) {
                     if (this.verbose) {
-                        System.out.println("Got GET resquest for /hall_of_fame.html");
+                        System.out.println("Got GET request for /win.html");
                     }
-                    //return the hall of fame page
-                    this.sendWin();
+                    //first check if he won
+                    if(this.Game.check_win()) {
 
+                        //return the hall of fame page
+                        this.sendWin();
+                    }
+                    else
+                    {
+                        //he's trying to cheat, redirect to halloffame
+                        headerOut.println("HTTP/1.1 303 See Other");
+                        headerOut.println("Server: " + SERVER_DETAILS);
+                        headerOut.println("Date: " + new Date());
+                        headerOut.println("Location: " + "http://" +httpHost + "/hall_of_fame.html");
+                        headerOut.println("Connection: close");
+                        headerOut.println("Content-length: 0");
+                        headerOut.println();
+                        headerOut.flush();
+
+                    }
                 }
 
                 else {
@@ -317,15 +332,6 @@ public class BattleshipHTTPHandler implements Runnable{
 
                     if (0 <= target && target < 100){
                         // the input is a valid cell
-                        String putCookie = "";
-                        if (this.master.cookieManager.isUsed(this.cookie)) {
-                            this.Game = this.master.cookieManager.getGame(this.cookie);
-                        } else {
-                            Pair<String, BatThomi> p = this.master.cookieManager.getNewGame();
-                            this.cookie = p.getKey();
-                            this.Game = p.getValue();
-                            putCookie = "Set-Cookie: " + "Battleship=" + this.cookie + "\r\n";
-                        }
 
                         if(this.Game.getNmbTries() >=70){
                             headerOut.println("HTTP/1.1 303 See Other");
@@ -527,10 +533,16 @@ public class BattleshipHTTPHandler implements Runnable{
         play_html += "\r\n";
         play_html += "        request.onreadystatechange = function() {\r\n";
         play_html += "        if (this.readyState == 4 && this.status == 200) {\r\n";
-        play_html += "        //change the gamestate\r\n";
+        play_html += "        if (parseInt(this.responseText) == -1) {\r\n";
+        play_html += "        document.getElementById(\"field\").style.display = \"none\";\r\n";
+        play_html += "        document.getElementById(\"score\").innerHTML = \"You won! <a href=\\\"win.html\\\">Click here to continue.</a> \";\r\n";
+        play_html += "        }\r\n";
+        play_html += "        else\r\n";
+        play_html += "        {//change the gamestate\r\n";
         play_html += "        gamestate[id] = parseInt(this.responseText);\r\n";
         play_html += "        //redraw\r\n";
         play_html += "        draw();\r\n";
+        play_html += "        }\r\n";
         play_html += "        }\r\n";
         play_html += "        };\r\n";
         play_html += "        request.open(\"GET\", \"/play.html?id=\" + id, true);\r\n";
