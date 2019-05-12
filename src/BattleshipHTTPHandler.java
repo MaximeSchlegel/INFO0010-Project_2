@@ -324,10 +324,10 @@ public class BattleshipHTTPHandler implements Runnable{
 
         headerOut.println("Content-length: " + play_html.getBytes().length);
         headerOut.println(); // blank line between headers and content, very important !
-        //headerOut.flush(); // flush character output stream buffer
+        headerOut.flush(); // flush character output stream buffer
 
-        this.dataOut.write(play_html.getBytes(), 0, play_html.getBytes().length);
-        this.dataOut.flush();
+        headerOut.print(play_html);
+        headerOut.flush();
     }
     private void sendHallOfFame() throws IOException {
         StringBuilder responseBuilder = new StringBuilder();
