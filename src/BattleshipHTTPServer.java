@@ -39,19 +39,19 @@ public class BattleshipHTTPServer {
             FileInputStream fin_expl = new FileInputStream(fexpl);
             byte[] bytes_expl = new byte[(int) fexpl.length()];
             fin_expl.read(bytes_expl);
-            explosion = Base64.getEncoder().encodeToString(bytes_expl);
+            this.explosion = Base64.getEncoder().encodeToString(bytes_expl);
 
             File fcloud = new File(WEB_ROOT, claudy_dir);
             FileInputStream fin_cloud = new FileInputStream(fcloud);
             byte[] bytes_cloud = new byte[(int) fcloud.length()];
             fin_cloud.read(bytes_cloud);
-            claudy = Base64.getEncoder().encodeToString(bytes_cloud);
+            this.claudy = Base64.getEncoder().encodeToString(bytes_cloud);
 
             File fwater = new File(WEB_ROOT, wauta_dir);
             FileInputStream fin_water = new FileInputStream(fwater);
             byte[] bytes_water = new byte[(int) fwater.length()];
             fin_water.read(bytes_water);
-            wauta = Base64.getEncoder().encodeToString(bytes_water);
+            this.wauta = Base64.getEncoder().encodeToString(bytes_water);
         }
         catch(Exception e){
             System.out.println(e + "Il y a eu un problème dans la lecture des fichiers images.");
