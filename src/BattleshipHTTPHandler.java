@@ -448,17 +448,17 @@ public class BattleshipHTTPHandler implements Runnable{
         //css for no script
         play_html += "    <style>";
         play_html += ".wata{\n";
-        play_html += "background: url(data:image/png;base64," + this.master.wauta50  +  ");\n";
+        play_html += "background: url(data:image/png;base64," + this.master.water50  +  ");\n";
         play_html += "width: 50px;\n";
         play_html += "height: 50px;\n";
         play_html += "}";
         play_html += ".claudy{\n";
-        play_html += "background: url(data:image/png;base64," + this.master.wautaclaudy  +  ");\n";
+        play_html += "background: url(data:image/png;base64," + this.master.mistyWater  +  ");\n";
         play_html += "width: 50px;\n";
         play_html += "height: 50px;\n";
         play_html += "}";
         play_html += ".expl{\n";
-        play_html += "background: url(data:image/png;base64," + this.master.explosion  + ");\n";
+        play_html += "background: url(data:image/png;base64," + this.master.explosion + ");\n";
         play_html += "width: 50px;\n";
         play_html += "height: 50px;\n";
         play_html += "}";
@@ -472,9 +472,9 @@ public class BattleshipHTTPHandler implements Runnable{
         play_html += "var gamestate = " + java.util.Arrays.toString(gamestate) + ";\r\n";
         play_html += "var score = "+ ((70 - this.Game.getNmbTries()) + 1) + ";\r\n";
         play_html += "        var background = new Image();\r\n";
-        play_html +=  "       background.src= \"data:image/png;base64," + this.master.wauta  + "\";\r\n";
+        play_html +=  "       background.src= \"data:image/png;base64," + this.master.water  + "\";\r\n";
         play_html += "        nuage = new Image();\r\n";
-        play_html += "       nuage.src = \"data:image/png;base64," + this.master.claudy + "\";\r\n";
+        play_html += "       nuage.src = \"data:image/png;base64," + this.master.mist + "\";\r\n";
         play_html += "        explosion = new Image();\r\n";
         play_html += "       explosion.src = \"data:image/png;base64," + this.master.explosion + "\";\r\n";
         play_html += "        var context;\r\n";
