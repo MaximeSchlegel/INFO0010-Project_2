@@ -9,7 +9,7 @@ public class CookieManager {
     private Map<String, BatThomi> savedGames;
 
     private static final String ALLOWED_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" + "0123456789"; //length = 62
-    private static final int COOKIE_LENGTH = 16;
+    private static final int COOKIE_LENGTH = 26;
     private static final int[] SHIP_SIZE = {2,3,3,4,5};
 
     public CookieManager() {
