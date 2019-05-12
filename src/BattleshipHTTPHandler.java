@@ -71,6 +71,31 @@ public class BattleshipHTTPHandler implements Runnable{
             String httpMethod = requestTokenizer.nextToken();
             String httpQuerry = requestTokenizer.nextToken();
 
+            String id_from_get = "";
+            //parse get if there is any
+            //parse cookie
+            System.out.println("httprequest: "+httpQuerry);
+
+            //did we get variables with the get ?
+            if(httpQuerry.indexOf('?') >=0) {
+                String[] splitHttpQuery = httpQuerry.split("\\?");
+                httpQuerry = splitHttpQuery[0];
+                String getVariables = splitHttpQuery[1];
+                if (!getVariables.equals("")) {
+                    String[] splitedGet = getVariables.split("=|;");
+                    while (requestTokenizer.hasMoreTokens() && !splitedGet[0].equals("id")) {
+                        id_from_get = requestTokenizer.nextToken();
+                        splitedGet = id_from_get.split("=|;");
+                    }
+                    if (splitedGet[0].equals("id") && splitedGet.length == 2) {
+                        id_from_get = splitedGet[1];
+                    } else {
+                        id_from_get = "";
+                    }
+                }
+                System.out.println("id_from= " + id_from_get);
+            }
+
             //get the host name
             String hostLine = inFromClient.readLine(); //get the second line to extract the host address
             StringTokenizer hostTokenizer = new StringTokenizer(hostLine);
@@ -96,7 +121,18 @@ public class BattleshipHTTPHandler implements Runnable{
                     break;
                 }
             }
-
+            //parse cookie
+            if (!this.cookie.equals("")){
+                String[] splitedCookie = this.cookie.split("=|;");
+                while (CookieTokenizer.hasMoreTokens() && !splitedCookie[0].equals("Battleship")){
+                    this.cookie = CookieTokenizer.nextToken();
+                }
+                if (splitedCookie[0].equals("Battleship") && splitedCookie.length == 2){
+                    this.cookie = splitedCookie[1];
+                } else {
+                    this.cookie = "";
+                }
+            }
             System.out.println("Cookie: " + this.cookie);
 
 
@@ -121,6 +157,7 @@ public class BattleshipHTTPHandler implements Runnable{
                         System.out.println("Got GET resquest for /play.html");
                     }
 
+
                     //proc the launch of the game
                     //String id = Cookie.get();
 
@@ -134,18 +171,42 @@ public class BattleshipHTTPHandler implements Runnable{
                         this.cookie = p.getKey();
                         this.Game = p.getValue();
                     }
-                    System.out.println("Got the cookies figured out");
-                    // send HTTP Headers
-                    headerOut.println("HTTP/1.1 200 OK");
-                    headerOut.println("Server: " + httpHost);
-                    headerOut.println("Date: " + new Date());
-                    headerOut.println("Content-type: " + "text/html");
+                    //with the id ?
+                    if(!id_from_get.equals("")) {
+                        //got get from javascript ajax need only to send one number
+                        try {
+                            int id = Integer.parseInt(id_from_get);
+                            //first update gamestate
+                            int value = this.Game.boom(id);
+                            // send HTTP Headers
+                            headerOut.println("HTTP/1.1 200 OK");
+                            headerOut.println("Server: " + httpHost);
+                            headerOut.println("Date: " + new Date());
+                            headerOut.println("Content-type: " + "text/html");
+//
+                            headerOut.println("Content-length: 1");
+                            headerOut.println(); // blank line between headers and content, very important !
+                            headerOut.flush(); // flush character output stream buffer
+//
+                            headerOut.print(value);
+                            headerOut.flush();
 
-                    //replace here with sessionid
-                    headerOut.println("Set-Cookie: " + "Battleship=" + this.cookie);
-                    /////
-                    printPlay();
+                        } catch (Exception e) {
+                            System.out.println("Wrong variable through GET: " + e);
+                        }
+                    }
+                    else {
+                        // send HTTP Headers
+                        headerOut.println("HTTP/1.1 200 OK");
+                        headerOut.println("Server: " + httpHost);
+                        headerOut.println("Date: " + new Date());
+                        headerOut.println("Content-type: " + "text/html");
 
+                        //replace here with sessionid
+                        headerOut.println("Set-Cookie: " + "Battleship=" + this.cookie);
+                        /////
+                        printPlay();
+                    }
                     /////
                 } else if (httpQuerry.equals("/hall_of_fame.html")) {
                     if (this.verbose) {
@@ -259,23 +320,11 @@ public class BattleshipHTTPHandler implements Runnable{
         play_html += "        var y;\r\n";
         play_html += "        for(var id=0;id<100;id++)\r\n";
         play_html += "        {\r\n";
-        play_html += "        switch(gamestate[id]){\r\n";
-        play_html += "\r\n";
-        play_html += "        case 0:\r\n";
-        play_html += "        //print nuage\r\n";
-        play_html += "        context.drawImage(nuage,((id%10))*50,Math.floor(id/10)*50,50,50);\r\n";
-        play_html += "        break;\r\n";
-        play_html += "        case 1:\r\n";
-        play_html += "        //print explosion\r\n";
-        play_html += "        context.drawImage(explosion,((id%10))*50,Math.floor(id/10)*50,50,50);\r\n";
-        play_html += "        break;\r\n";
-        play_html += "        //case 2:\r\n";
-        play_html += "        //print nothing\r\n";
-        play_html += "\r\n";
-        play_html += "\r\n";
-        play_html += "        }\r\n";
         play_html += "        //print the corresponding picture on screen\r\n";
-        play_html += "        if(gamestate[id] ==0)\r\n";
+        play_html += "        if(gamestate[id] >0 && gamestate[id] <8)\r\n";
+        play_html += "        context.drawImage(explosion,((id%10))*50,Math.floor(id/10)*50,50,50);\r\n";
+        play_html += "        else if(gamestate[id] ==8 )\r\n";
+        play_html += "        context.drawImage(nuage,((id%10))*50,Math.floor(id/10)*50,50,50);\r\n";
         play_html += "        //ici faut avoir un truc pour choisir quel image\r\n";
         play_html += "        context.drawImage(nuage,(x)*50,(y)*50,50,50);\r\n";
         play_html += "\r\n";
@@ -290,7 +339,7 @@ public class BattleshipHTTPHandler implements Runnable{
         play_html += "\r\n";
         play_html += "        //convertir en identité grid?\r\n";
         play_html += "        var id = Math.floor(mx/50) + Math.floor(my/50)*10;\r\n";
-        play_html += "        alert(id);\r\n";
+        play_html += "        //alert(id);\r\n";
         play_html += "\r\n";
         play_html += "        //TODO: do ajax to send grid identity\r\n";
         play_html += "        var request = new XMLHttpRequest();\r\n";
@@ -298,25 +347,27 @@ public class BattleshipHTTPHandler implements Runnable{
         play_html += "        request.onreadystatechange = function() {\r\n";
         play_html += "        if (this.readyState == 4 && this.status == 200) {\r\n";
         play_html += "        //change the gamestate\r\n";
-        play_html += "        gamestate(id) = parseInt(this.responseText);\r\n";
+        play_html += "        gamestate[id] = parseInt(this.responseText);\r\n";
         play_html += "        //redraw\r\n";
         play_html += "        draw();\r\n";
         play_html += "        }\r\n";
-        play_html += "        request.open(\"POST\", \"\", true);\r\n";
-        play_html += "        request.setRequestHeader(\"Content-type\", \"application/x-www-form-urlencoded\");\r\n";
-        play_html += "        request.send(\"id=\" + id);\r\n";
         play_html += "        };\r\n";
+        play_html += "        request.open(\"GET\", \"/play.html?id=\" + id, true);\r\n";
+        play_html += "        //request.setRequestHeader(\"Content-type\", \"application/x-www-form-urlencoded\");\r\n";
+        play_html += "        request.send();\r\n";
+
         play_html += "\r\n";
         play_html += "        }\r\n";
         play_html += "\r\n";
         play_html += "        </script>\r\n";
         play_html += "        <!-- faut remplacer les valeurs d'une facon ou d'une autre -->\r\n";
         play_html += "        <div id=\"parent\" style=\"position: relative;max-width: 500px;max-height: 500px;\">\r\n";
-        play_html += "        <canvas id=\"field\"  style=\"position: relative;left: 10px;top: 0px;z-index: -1;\" width=\"500\" height=\"500\" ></canvas>\r\n";
+        play_html += "        <canvas id=\"field\"  style=\"display: none;position: relative;left: 10px;top: 0px;z-index: 1;\" width=\"500\" height=\"500\" ></canvas>\r\n";
         play_html += "        </div>\r\n";
         play_html += "\r\n";
         play_html += "        <script type=\"text/javascript\">\r\n";
         play_html += "        window.onload = charger;\r\n";
+        play_html += "        document.getElementById(\"field\").onclick=shoot;\r\n";
         play_html += "        </script>\r\n";
         play_html += "\r\n";
         play_html += "        </body>\r\n";

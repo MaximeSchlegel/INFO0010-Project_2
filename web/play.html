@@ -21,10 +21,7 @@
    function charger(){
     canvas = document.getElementById("field");
     context = canvas.getContext("2d");
-
     draw();
-
-
     canvas.style.display = "block";
     }
     function draw(){
@@ -36,7 +33,7 @@
         for(var id=0;id<100;id++)
         {
             switch(gamestate[id]){
-
+              if(
             case 0:
             //print nuage
             context.drawImage(nuage,((id%10))*50,Math.floor(id/10)*50,50,50);
@@ -66,7 +63,7 @@
 
     //convertir en identité grid?
     var id = Math.floor(mx/50) + Math.floor(my/50)*10;
-    alert(id);
+    //alert(id);
 
     //TODO: do ajax to send grid identity
     var request = new XMLHttpRequest();
@@ -78,22 +75,24 @@
         //redraw
         draw();
     }
-    request.open("POST", "", true);
-    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    request.send("id=" + id);
-};
+    };
+    request.open("get", "/play.html?id=" + id, true);
+    //request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    request.send();
+
 
     }
 
 </script>
 <!-- faut remplacer les valeurs d'une facon ou d'une autre -->
 <div id="parent" style="position: relative;max-width: 500px;max-height: 500px;">
-<canvas id="field"  style="position: relative;left: 10px;top: 0px;z-index: -1;" width="500" height="500" ></canvas>
+<canvas id="field"  onclick="shoot" style="display: none;position: relative;left: 10px;top: 0px;z-index: 1;" width="500" height="500" ></canvas>
 </div>
 
 <script type="text/javascript">
     window.onload = charger;
+    document.getElementById("field").onclick=shoot;
 </script>
 
 </body>
-</html>
+</html>      

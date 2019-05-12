@@ -40,30 +40,31 @@ public class BatThomi {
         for(int i =0;i<100;i++)
         {
             //touché
-            if(grid[i%10][(i/10)%10] <0)
-                view[i] = 1;
+            if(grid[i%10][(i/10)%10] <=0)
+                view[i] = -grid[i%10][(i/10)%10];
                 //plouf
-            else if(grid[i%10][(i/10)%10] ==0)
-                view[i] = 2;
+            else
+                view[i] = 8;
         }
 
         return view;
     }
 
-    public boolean boom(int id)
+    public int boom(int id)
     {
         int posx = id%10;
         int posy = (id/10)%10;
+
         if(grid[posx][posy] == 8)
             grid[posx][posy] = 0;
         grid[posx][posy] = -grid[posx][posy];
 
-        return (grid[posx][posy] !=0);
+        return -grid[posx][posy];
     }
 
 
     public void populate() {
-        grid = new int [10][10];
+        this.grid = new int [10][10];
             for(int i = 0; i < 10; i++)
                 Arrays.fill(grid[i],8);
     }
