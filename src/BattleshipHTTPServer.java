@@ -7,78 +7,85 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class BattleshipHTTPServer {
-    //version of the game
-    private static final int VERSION = 2;
 
-    //port to listen connection
-    private int portNumber;
-    // verbose mode
-    private boolean verbose;
-    //hold the id, score and date of completion of the best game
-    protected HallOfFame bestGames;
-    //hold the on going games
-    protected CookieManager cookieManager;
-    //Thread pool to execute client request
-    private ExecutorService threadPool;
+    private int portNumber; //port to listen connection on
+    private boolean verbose; //verbose mode
 
+    private ExecutorService threadPool; //Thread pool to execute clients requests
+
+    protected HallOfFame bestGames; //hold the id and score of the best games
+    protected CookieManager cookieManager; //hold the on going games
 
     //keep the pictures in base64 saved for all games
-    public String explosion;
-    public String wauta;
-    public String claudy;
-    public String wauta50;
-    public String wautaclaudy;
-    private static final File WEB_ROOT = new File("./web/");
+    protected String explosion;
+    protected String water;
+    protected String mist;
+    protected String water50;
+    protected String mistyWater;
 
-    public BattleshipHTTPServer(int threadPoolSize, int portNumber, boolean verbose,
-                                String expl_dir, String wauta_dir, String claudy_dir, String wauta50_dir, String wautaclaudy_dir) {
+    //Path to the images files
+    private static final File WEB_ROOT = new File("./web/");
+    private static  final String EXPLOSION_PATH = "explosion50.jpg";
+    private static  final String WATER_PATH = "Wauta.jpg";
+    private static  final String MIST_PATH = "Claudy.png";
+    private static  final String WATER50_PATH = "wauta50.jpg";
+    private static  final String MISTYWATER_PATH = "Clauda50.png";
+
+
+    public BattleshipHTTPServer(int threadPoolSize, int portNumber, boolean verbose) {
         try {
             //save the pictures in base 64
-            File fexpl = new File(WEB_ROOT, expl_dir);
-            FileInputStream fin_expl = new FileInputStream(fexpl);
-            byte[] bytes_expl = new byte[(int) fexpl.length()];
-            fin_expl.read(bytes_expl);
-            this.explosion = Base64.getEncoder().encodeToString(bytes_expl);
+            File explosionFile = new File(WEB_ROOT, EXPLOSION_PATH);
+            FileInputStream explosionFileInput = new FileInputStream(explosionFile);
+            byte[] explosionBytes = new byte[(int) explosionFile.length()];
+            explosionFileInput.read(explosionBytes);
+            this.explosion = Base64.getEncoder().encodeToString(explosionBytes);
+            explosionFileInput.close();
 
-            File fcloud = new File(WEB_ROOT, claudy_dir);
-            FileInputStream fin_cloud = new FileInputStream(fcloud);
-            byte[] bytes_cloud = new byte[(int) fcloud.length()];
-            fin_cloud.read(bytes_cloud);
-            this.claudy = Base64.getEncoder().encodeToString(bytes_cloud);
+            File mistFile = new File(WEB_ROOT, MIST_PATH);
+            FileInputStream mistFileInput = new FileInputStream(mistFile);
+            byte[] mistBytes = new byte[(int) mistFile.length()];
+            mistFileInput.read(mistBytes);
+            this.mist = Base64.getEncoder().encodeToString(mistBytes);
+            mistFileInput.close();
 
-            File fwater = new File(WEB_ROOT, wauta_dir);
-            FileInputStream fin_water = new FileInputStream(fwater);
-            byte[] bytes_water = new byte[(int) fwater.length()];
-            fin_water.read(bytes_water);
-            this.wauta = Base64.getEncoder().encodeToString(bytes_water);
+            File waterFile = new File(WEB_ROOT, WATER_PATH);
+            FileInputStream waterFileInput = new FileInputStream(waterFile);
+            byte[] waterBytes = new byte[(int) waterFile.length()];
+            waterFileInput.read(waterBytes);
+            this.water = Base64.getEncoder().encodeToString(waterBytes);
+            waterFileInput.close();
 
-            File fwater50 = new File(WEB_ROOT, wauta50_dir);
-            FileInputStream fin_water50 = new FileInputStream(fwater50);
-            byte[] bytes_water50 = new byte[(int) fwater50.length()];
-            fin_water50.read(bytes_water50);
-            this.wauta50 = Base64.getEncoder().encodeToString(bytes_water50);
+            File water50File = new File(WEB_ROOT, WATER50_PATH);
+            FileInputStream water50FileInput = new FileInputStream(water50File);
+            byte[] water50Bytes = new byte[(int) water50File.length()];
+            water50FileInput.read(water50Bytes);
+            this.water50 = Base64.getEncoder().encodeToString(water50Bytes);
+            water50FileInput.close();
 
-            File fwaterclaudy = new File(WEB_ROOT, wautaclaudy_dir);
-            FileInputStream fin_waterclaudy = new FileInputStream(fwaterclaudy);
-            byte[] bytes_waterclaudy = new byte[(int) fwaterclaudy.length()];
-            fin_waterclaudy.read(bytes_waterclaudy);
-            this.wautaclaudy = Base64.getEncoder().encodeToString(bytes_waterclaudy);
-
+            File mistyWaterFile = new File(WEB_ROOT, MISTYWATER_PATH);
+            FileInputStream mistyWaterFileInput = new FileInputStream(mistyWaterFile);
+            byte[] mistyWaterBytes = new byte[(int) mistyWaterFile.length()];
+            mistyWaterFileInput.read(mistyWaterBytes);
+            this.mistyWater = Base64.getEncoder().encodeToString(mistyWaterBytes);
+            mistyWaterFileInput.close();
         }
-        catch(Exception e){
-            System.out.println(e + "Il y a eu un problème dans la lecture des fichiers images.");
+        catch (Exception e) {
+            System.out.println("An error occured when loading the images:" + e.getMessage());
         }
 
-        this.threadPool = Executors.newFixedThreadPool(threadPoolSize);
         this.portNumber = portNumber;
         this.verbose = verbose;
+
+        this.threadPool = Executors.newFixedThreadPool(threadPoolSize);
+
         this.bestGames = new HallOfFame();
         this.cookieManager = new CookieManager();
     }
 
     private void launch() throws Exception {
         try {
-            //create the server socket listening on the gien port
+            //create the server socket listening on the given port
             ServerSocket serverSocket = new ServerSocket(this.portNumber);
 
             if (this.verbose) {
@@ -90,15 +97,15 @@ public class BattleshipHTTPServer {
             while (true) {
                 Socket socket = serverSocket.accept();
 
-                if (verbose) {
+                if (this.verbose) {
                     System.out.println("Connection opened. (" + new Date() + ")");
                 }
 
-                        //create the worker to handle the connection
-                        BattleshipHTTPHandler worker = new BattleshipHTTPHandler(socket, this, this.verbose);
-                        this.threadPool.execute(worker);
+                //create the worker to handle the connection
+                BattleshipHTTPHandler worker = new BattleshipHTTPHandler(socket, this, this.verbose);
+                this.threadPool.execute(worker);
 
-                if (verbose) {
+                if (this.verbose) {
                     System.out.println("Connection handled. (" + new Date() + ")\n");
                 }
 
@@ -110,13 +117,14 @@ public class BattleshipHTTPServer {
 
     public static void main(String[] args) {
         /*
-         * Main method accept up to 2 args
-         * args[0] => number of threads
-         * args[1] => port to listen on
+         * Main method accept up to 3 args
+         * args[0] => number of threads (default 10)
+         * args[1] => port to listen on (default 8000)
+         * args[2] => verbose mode (default true)
          */
-        int portNumber = 2511;
+        int threadPoolSize = 10;
+        int portNumber = 8000;
         boolean verbose = true;
-        int threadPoolSize = 50;
 
         if (args.length == 1) {
             threadPoolSize = Integer.parseInt(args[0]);
@@ -128,12 +136,11 @@ public class BattleshipHTTPServer {
             portNumber = Integer.parseInt(args[1]);
             verbose = Boolean.parseBoolean(args[2]);
         } else if (args.length > 3) {
-            System.out.println("Incorrect number of args");
+            System.out.println("Incorrect number of args used");
             System.exit(1);
         }
 
-        BattleshipHTTPServer server = new BattleshipHTTPServer(threadPoolSize, portNumber, verbose,
-                "explosion50.jpg","Wauta.jpg","Claudy.png","wauta50.jpg","Clauda50.png");
+        BattleshipHTTPServer server = new BattleshipHTTPServer(threadPoolSize, portNumber, verbose);
 
         try {
             server.launch();
