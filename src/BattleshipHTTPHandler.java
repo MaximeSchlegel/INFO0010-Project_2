@@ -31,6 +31,7 @@ public class BattleshipHTTPHandler implements Runnable{
     private String cookie;
     BatThomi Game;
 
+
     public BattleshipHTTPHandler(Socket socket, BattleshipHTTPServer server) {
         //initialize the io
         this.connectedClient = socket;
@@ -165,6 +166,26 @@ public class BattleshipHTTPHandler implements Runnable{
                         this.Game = p.getValue();
                         putCookie = "Set-Cookie: " + "Battleship=" + this.cookie + "\r\n";
                     }
+                    if(this.Game.getNmbTries() >=70){
+                        headerOut.println("HTTP/1.1 303 See Other");
+                        headerOut.println("Server: " + SERVER_DETAILS);
+                        headerOut.println("Date: " + new Date());
+                        headerOut.println("Location: " + "http://" +httpHost + "/hall_of_fame.html");
+                        headerOut.println("Connection: close");
+                        headerOut.println("Content-length: 0");
+                        headerOut.println();
+                        headerOut.flush();
+                    }
+                    if(this.Game.check_win()){
+                        headerOut.println("HTTP/1.1 303 See Other");
+                        headerOut.println("Server: " + SERVER_DETAILS);
+                        headerOut.println("Date: " + new Date());
+                        headerOut.println("Location: " + "http://" +httpHost + "/win.html");
+                        headerOut.println("Connection: close");
+                        headerOut.println("Content-length: 0");
+                        headerOut.println();
+                        headerOut.flush();
+                    }
                     //with the id ?
                     if(!id_from_get.equals("")) {
                         //got get from javascript ajax need only to send one number
@@ -210,7 +231,16 @@ public class BattleshipHTTPHandler implements Runnable{
                     //return the hall of fame page
                     this.sendHallOfFame();
 
-                } else {
+                } else if (httpQuerry.equals("/win.html")) {
+                    if (this.verbose) {
+                        System.out.println("Got GET resquest for /hall_of_fame.html");
+                    }
+                    //return the hall of fame page
+                    this.sendWin();
+
+                }
+
+                else {
                     //this page does not exist
                     this.fileNotFound(httpQuerry);
                 }
@@ -411,6 +441,43 @@ public class BattleshipHTTPHandler implements Runnable{
 
             "   </body>\n" +
             "</html>");
+
+        String response = responseBuilder.toString();
+
+
+        // send HTTP Headers
+        this.headerOut.println("HTTP/1.1 200 OK");
+        this.headerOut.println("Server: " + SERVER_DETAILS);
+        this.headerOut.println("Date: " + new Date());
+        this.headerOut.println("Content-type: " + "text/html");
+        this.headerOut.println("Content-length: " + response.getBytes().length);
+        this.headerOut.println();
+        this.headerOut.flush();
+
+        this.dataOut.write(response.getBytes(),0, response.getBytes().length);
+        this.dataOut.flush();
+    }
+
+    private void sendWin() throws IOException {
+        StringBuilder responseBuilder = new StringBuilder();
+        responseBuilder.append(
+                "<!DOCTYPE html>\n" +
+                        "<html lang=\"en\">\n" +
+                        "   <head>\n" +
+                        "<link rel=\"icon\" type=\"image/jpg\" href=\"" + "data:image/png;base64,/9j/4QAWRXhpZgAATU0AKgAAAAgAAAAAAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gOTAK/9sAQwABAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB/9sAQwEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEB/8AAEQgAGQAZAwEiAAIRAQMRAf/EABgAAAMBAQAAAAAAAAAAAAAAAAgJCgAH/8QAMRAAAQQCAQIDAg8AAAAAAAAABAIDBQYBBwAIEhETIQkUChYaMUFCU1hik5ei0dLX/8QAGAEAAgMAAAAAAAAAAAAAAAAABwgEBQb/xAAmEQABBAIBAwQDAQAAAAAAAAADAQIEBQYHERITFAAhIiMIFRdB/9oADAMBAAIRAxEAPwB8UYMO6p1+RnK/XI4dKHTp63WSKqtci2nimARlSdgnTAosD3yRMDjQUvEJdOkTBARkOkvtt5HXr5tO8NG9L+wLXpo6Dr+2F/EtrXlgnIQbYFYfanbjCAGy0XGhPlRNvEfhFSYwhIJB0eM4/k9zClBYSnlvtDNURO3ej3asXJ5U07R3aluOCd8xxDaJ/U1pjbUI2S2lXYSMaAzLxjoxCHWM5PS92YeYZdbRXp/qq2hqOryWs0HZuWnZV9Z7usbOUWVBV+wpbcSDd9ekIewbry7Rbi8utyNfW3DzTSno61wk5HkKS1mrrM241kNdW2Riw6e1hK2Rbwo3mWVOpivjOsQwynGGw8VFbJ8NzguKguhpVcvQ4v6I/GOw3RgeQ55jroN1kGDZdEB/PLuWWjp85r4sOBbmonZVE7srHpVux5awM5YcgIXHQxTRGMWQymrRm3ojfuldZ7lgg5SJB2DVQ5lyImQCImWgplh8qFtEBIRxLrz4hMDaombiFIceeUpsJt7Lq8Od3Oq+Yr7Vf5qv7cG/o9ldH3XQ7Fo0hds2eaKfas+7Kme5gK01LZEvHAC2mck6m8tZ4AdkPARJH2YV+WgLdLvF2ZmZzKyUxHiEF3p/H+7+eEmDcwLASyK6wBZx0I8KTorSCDKUL1H5DBF+4DToiGYA/wBwmEa0qI9rk9K7k2NXWK3lhR32P2uMWUM7kNRXbGfs61hFaQUSWRjBhklAJ6CdMjNSLLViyYvMcg1WRTbvwgm4bO1LsfWYnSrUYQi+U6bqjM0Rt+wyLMU7Lje7pOdj26KE4agfxyrIyTBlOemMPI+fis4zrNkMt4xNa0DS9hPquGuLq28r8fXKUSNbZcSn6U9zrisemM5+twK+bhpvdGa2yYoC2lIVxIwVCJ4LS1AqDUncVF6JvDuXqq+/PH+cemL1jufY2m4dhX68yBKOBbzmT7GI+sqLUUmYwDIzJCuuIE8oXIATB9McgWORqK5qr7+mM0br7I11boO7VOrXKHnII8QtomIuw8IQWIyUwQbCkSUYOgzETMMMqj5MVSCGCBX3POEIzhLWWt/KTbH9y+k/rVP/AObcmL5uSMZ0tr/GGTBVdTI6JZAvKkm0tJHyE1yN6OZjUZ8XqjuEVXcN5X4pxWbX2Vle65lPYbDlxbaXRR5USuPEroNM8ceYUBjDMtOCEslvcjscJJKlQCuKoe2pzK//2Q=="+ "\" />\r\n" +
+                        "       <meta charset=\"UTF-8\">\n" +
+                        "       <title>Battleship - Hall of Fame</title>\n" +
+                        "   </head>\n" +
+                        "   <body>\n" +
+                        "       <h1>You Win</h1>\n");
+
+        responseBuilder.append(
+
+                " <form method=\"post\">\n" +
+                        "    <p>Enter your name: <input type=\"text\" name=\"nom\" style=\"border-radius: 5px;\" placeholder=\"name\"></p>\n" +
+                        "    <input type=\"submit\" value=\"Submit\" style=\"background: blue; color: white; border-radius: 5px; height: 35px; width: 70px;\">" +
+                        " </body>\n" +
+                        "</html>");
 
         String response = responseBuilder.toString();
 
