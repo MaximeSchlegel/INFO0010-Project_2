@@ -12,16 +12,11 @@ public class BattleshipHTTPHandler implements Runnable{
 
     //web folder and files to return
     private static final File WEB_ROOT = new File("./web/");
-    private static final String DEFAULT_FILE = "play.html";
-    private static final String PLAY_FILE = "play.html";
-    private static final String HALL_OF_FAME_FILE = "hall_of_fame.html";
     private static final String FILE_NOT_FOUND = "404.html";
     private static final String METHOD_NOT_SUPPORTED = "not_supported.html";
 
     //http header variable
-    private static String SERVER_DETAILS = "Java Http Server";
-
-
+    private static String SERVER_DETAILS = "Battleship Http Server";
 
     //connection and i/o to the client
     private Socket connectedClient;
@@ -33,11 +28,8 @@ public class BattleshipHTTPHandler implements Runnable{
     private BattleshipHTTPServer master;
 
     private boolean verbose;
-    
-    BatThomi Game;
-
-
     private String cookie;
+    BatThomi Game;
 
     public BattleshipHTTPHandler(Socket socket, BattleshipHTTPServer server) {
         //initialize the io
@@ -78,14 +70,12 @@ public class BattleshipHTTPHandler implements Runnable{
             StringTokenizer requestTokenizer = new StringTokenizer(requestLine); // parse the line to get the token
             String httpMethod = requestTokenizer.nextToken();
             String httpQuerry = requestTokenizer.nextToken();
-            System.out.println(httpMethod + " " + httpQuerry);
 
             //get the host name
             String hostLine = inFromClient.readLine(); //get the second line to extract the host address
             StringTokenizer hostTokenizer = new StringTokenizer(hostLine);
             hostTokenizer.nextToken();
             String httpHost = hostTokenizer.nextToken();
-            System.out.println("Host :" + httpHost);
 
             //get the cookie name ???
             String Cookieline = inFromClient.readLine(); //get the second line to extract the host address
@@ -107,12 +97,18 @@ public class BattleshipHTTPHandler implements Runnable{
                 }
             }
 
+            System.out.println("Cookie: " + this.cookie);
+
 
             if (httpMethod.equals("GET")) {
                 if (httpQuerry.equals("/")) {
+                    if (this.verbose) {
+                        System.out.println("Got GET resquest for root");
+                    }
+
                     //if the client required the root, we redirect him on the play page
                     headerOut.println("HTTP/1.1 303 See Other");
-                    headerOut.println("Server: " + httpHost);
+                    headerOut.println("Server: " + SERVER_DETAILS);
                     headerOut.println("Date: " + new Date());
                     headerOut.println("Location: " + "http://" +httpHost + "/play.html");
                     headerOut.println("Connection: close");
@@ -121,9 +117,11 @@ public class BattleshipHTTPHandler implements Runnable{
                     headerOut.flush();
 
                 } else if (httpQuerry.equals("/play.html")) {
-                    System.out.println("Got the request");
+                    if (this.verbose) {
+                        System.out.println("Got GET resquest for /play.html");
+                    }
+
                     //proc the launch of the game
-                    String response = "Play";
                     //String id = Cookie.get();
 
                     if(this.master.cookieManager.isUsed(this.cookie)){
@@ -150,6 +148,9 @@ public class BattleshipHTTPHandler implements Runnable{
 
                     /////
                 } else if (httpQuerry.equals("/hall_of_fame.html")) {
+                    if (this.verbose) {
+                        System.out.println("Got GET resquest for /hall_of_fame.html");
+                    }
                     //return the hall of fame page
                     this.sendHallOfFame();
 
@@ -159,7 +160,9 @@ public class BattleshipHTTPHandler implements Runnable{
                 }
 
             } else if (httpMethod.equals("POST")) {
-
+                if (this.verbose) {
+                    System.out.println("Got POST resquest");
+                }
             } else {
                 this.methodNotSupported(httpMethod);
             }
@@ -225,8 +228,7 @@ public class BattleshipHTTPHandler implements Runnable{
         }
     }
 
-    private void printPlay()
-    {
+    private void printPlay() throws IOException {
         String play_html = "";
         play_html += "<!DOCTYPE html>\r\n";
         play_html += "<html lang=\"en\">\r\n";
@@ -324,8 +326,8 @@ public class BattleshipHTTPHandler implements Runnable{
         headerOut.println(); // blank line between headers and content, very important !
         //headerOut.flush(); // flush character output stream buffer
 
-        headerOut.print(play_html);
-        headerOut.flush();
+        this.dataOut.write(play_html.getBytes(), 0, play_html.getBytes().length);
+        this.dataOut.flush();
     }
     private void sendHallOfFame() throws IOException {
         StringBuilder responseBuilder = new StringBuilder();
