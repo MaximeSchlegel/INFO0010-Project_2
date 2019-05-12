@@ -6,6 +6,7 @@ import java.net.*;
 public class BatThomi {
 
     int[][] grid;
+    private int tries = 70;
 
 
     public BatThomi(int[] boats)
@@ -18,18 +19,20 @@ public class BatThomi {
 
     }
 
-    private boolean check_win() {
+    private int check_win() {
+        if(tries ==0)
+            return -1;
         for(int i =0;i < 10;i++)
         {
             for(int j =0;j<10;j++)
             {
                 if(grid[i][j] > 0)
                 {
-                    return false;
+                    return 0;
                 }
             }
         }
-        return true;
+        return 1;
     }
 
     public int[] peekabou()
@@ -58,6 +61,7 @@ public class BatThomi {
         if(grid[posx][posy] == 8)
             grid[posx][posy] = 0;
         grid[posx][posy] = -grid[posx][posy];
+        tries--;
 
         return -grid[posx][posy];
     }

@@ -156,13 +156,14 @@ public class BattleshipHTTPHandler implements Runnable{
                     if (this.verbose) {
                         System.out.println("Got GET resquest for /play.html");
                     }
-
+                    String putCookie ="";
                     if (this.master.cookieManager.isUsed(this.cookie)) {
                         this.Game = this.master.cookieManager.getGame(this.cookie);
                     } else {
                         Pair<String, BatThomi> p = this.master.cookieManager.getNewGame();
                         this.cookie = p.getKey();
                         this.Game = p.getValue();
+                        putCookie = "Set-Cookie: " + "Battleship=" + this.cookie + "\r\n";
                     }
                     //with the id ?
                     if(!id_from_get.equals("")) {
@@ -176,7 +177,7 @@ public class BattleshipHTTPHandler implements Runnable{
                             headerOut.println("Server: " + httpHost);
                             headerOut.println("Date: " + new Date());
                             headerOut.println("Content-type: " + "text/html");
-//
+                            headerOut.println("Connection: close");
                             headerOut.println("Content-length: 1");
                             headerOut.println(); // blank line between headers and content, very important !
                             headerOut.flush(); // flush character output stream buffer
@@ -191,9 +192,11 @@ public class BattleshipHTTPHandler implements Runnable{
                     else {
                         // send HTTP Headers
                         headerOut.println("HTTP/1.1 200 OK");
-                        headerOut.println("Server: " + httpHost);
+                        headerOut.println("Server: " + SERVER_DETAILS);
                         headerOut.println("Date: " + new Date());
                         headerOut.println("Content-type: " + "text/html");
+                        headerOut.println("Connection: close");
+                        headerOut.print(putCookie);
                         if (this.verbose) {
                             System.out.println("Got the cookies figured out");
                             System.out.println("Cookie: " + this.cookie);
@@ -366,11 +369,7 @@ public class BattleshipHTTPHandler implements Runnable{
         play_html += "        </body>\r\n";
         play_html += "        </html>\r\n";
 
-        this.headerOut.println("HTTP/1.1 200 OK");
-        this.headerOut.println("Server: " + SERVER_DETAILS);
-        this.headerOut.println("Date: " + new Date());
-        this.headerOut.println("Content-type: " + "text/html");
-        headerOut.println("Set-Cookie: " + "Battleship=" + this.cookie);
+
         this.headerOut.println("Content-length: " + play_html.getBytes().length);
         this.headerOut.println();
         this.headerOut.flush();
